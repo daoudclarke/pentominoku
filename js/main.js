@@ -5,8 +5,28 @@ function randomNumber() {
   return Math.ceil(Math.random() * 9);
 }
 
-function randomMove() {
-  return [randomNumber(), randomNumber(), randomNumber()]
+let allPositions = new Set();
+for (let i=1; i<=9; ++i) {
+  for (let j=1; j<=9; ++j) {
+    allPositions.add([i,j]);
+  }
+}
+
+function choose(choices) {
+  let index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+}
+
+function randomMove(sudoku) {
+  const positions = new Set();
+  for (const move of sudoku) {
+    positions.add([move[0], move[1]]);
+  }
+
+  const validPositions = new Set([...allPositions].filter(x => !positions.has(x)));
+
+  const position = choose(Array.from(validPositions));
+  return [position[0], position[1], randomNumber()]
 }
 
 function isValid(restrictions, newSolution) {
@@ -20,9 +40,14 @@ function isValid(restrictions, newSolution) {
 
 function solve(restrictions, sudoku) {
   for (let i=0; i<MAX_MOVES; ++i) {
-    const newSolution = sudoku.concat([randomMove()]);
+    const newSolution = sudoku.concat([randomMove(sudoku)]);
     if (!isValid(restrictions, newSolution)) {
       continue;
+    }
+
+    console.log("New solution", newSolution);
+    if (newSolution.length > 53) {
+      console.log("Solution", newSolution);
     }
 
     if (newSolution.length === 81) {
@@ -54,11 +79,6 @@ function getBoxKey(move) {
   return [box, move[2]].toString();
 }
 
-function sudokuRestrictions() {
-  return [sudokuRestriction(getPositionKey), sudokuRestriction(getRowKey),
-    sudokuRestriction(getColumnKey), sudokuRestriction(getBoxKey)];
-}
-
 function sudokuRestriction(keyFunction) {
   function restriction(sudoku) {
     const keys = new Set();
@@ -71,9 +91,17 @@ function sudokuRestriction(keyFunction) {
       keys.add(key);
     }
 
-    console.log("Keys", keys, sudoku);
     return true;
   }
 
   return restriction;
+}
+
+const positionRestriction = sudokuRestriction(getPositionKey);
+const rowRestriction = sudokuRestriction(getRowKey);
+const columnRestriction = sudokuRestriction(getColumnKey)
+const boxRestriction = sudokuRestriction(getBoxKey)
+
+function sudokuRestrictions() {
+  return [positionRestriction, rowRestriction, columnRestriction, boxRestriction];
 }
