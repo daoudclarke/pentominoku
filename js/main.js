@@ -67,10 +67,43 @@ function rowRestriction(fixedPoints) {
 }
 
 
+function columnRestriction(fixedPoints) {
+  const possible = allPossible.slice();
+  for (const [i, value] of fixedPoints) {
+    const column = i % 9;
+    let valueBinary = 1 << (value - 1);
+    const notValue = allNumbers - valueBinary;
+    for (let j=column; j<81; j+=9) {
+      if (j === i) {
+        possible[j] = valueBinary;
+      } else {
+        possible[j] &= notValue;
+      }
+    }
+  }
+  return possible;
+}
 
-function test() {
+
+
+function testRow() {
   let restrictions = [rowRestriction];
   let fixedPoints = [[4,5], [0,3]];
   let possible = getPossible(restrictions, fixedPoints);
   console.log("Possible", possible);
+}
+
+function testColumn() {
+  let restrictions = [columnRestriction];
+  let fixedPoints = [[4,5], [0,3]];
+  let possible = getPossible(restrictions, fixedPoints);
+  // console.log("Possible", possible);
+  printPossible(possible);
+}
+
+function printPossible(possible) {
+  console.log("Possible");
+  for (let i=0; i<81; i+=9) {
+    console.log(possible.slice(i, i+9));
+  }
 }
