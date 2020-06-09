@@ -85,6 +85,30 @@ function columnRestriction(fixedPoints) {
 }
 
 
+function boxRestriction(fixedPoints) {
+  const possible = allPossible.slice();
+  for (const [i, value] of fixedPoints) {
+    const column = i % 9;
+    const row = (i - column)/9;
+    const firstRow = row - (row % 3);
+    const firstColumn = column - (column % 3);
+    console.log("First row column", row, column, firstRow, firstColumn);
+    let valueBinary = 1 << (value - 1);
+    const notValue = allNumbers - valueBinary;
+    for (let k=firstRow; k<firstRow + 3; ++k) {
+      for (let l=firstColumn; l<firstColumn + 3; ++l) {
+        const j = k*9 + l;
+        if (j === i) {
+          possible[j] = valueBinary;
+        } else {
+          possible[j] &= notValue;
+        }
+      }
+    }
+  }
+  return possible;
+}
+
 
 function testRow() {
   let restrictions = [rowRestriction];
@@ -98,6 +122,20 @@ function testColumn() {
   let fixedPoints = [[4,5], [0,3]];
   let possible = getPossible(restrictions, fixedPoints);
   // console.log("Possible", possible);
+  printPossible(possible);
+}
+
+function testBox() {
+  let restrictions = [boxRestriction];
+  let fixedPoints = [[33,5]];
+  let possible = getPossible(restrictions, fixedPoints);
+  printPossible(possible);
+}
+
+function test() {
+  let restrictions = [rowRestriction, columnRestriction, boxRestriction];
+  let fixedPoints = [[33,5]];
+  let possible = getPossible(restrictions, fixedPoints);
   printPossible(possible);
 }
 
