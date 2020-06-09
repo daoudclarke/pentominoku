@@ -29,79 +29,48 @@ function randomMove(sudoku) {
   return [position[0], position[1], randomNumber()]
 }
 
-function isValid(restrictions, newSolution) {
+
+let allPossible = [];
+const allNumbers = 511;
+for (let i=0; i<81; ++i) {
+  allPossible.push(allNumbers);
+}
+
+
+function getPossible(restrictions, solution) {
+  const possible = allPossible.slice();
   for (const restriction of restrictions) {
-    if (!restriction(newSolution)) {
-      return false;
+    const restrictionPossible = restriction(solution);
+    for (let i=0; i<possible.length; ++i) {
+      possible[i] &= restrictionPossible[i];
     }
   }
-  return true;
+  return possible;
 }
 
-function solve(restrictions, sudoku) {
-  for (let i=0; i<MAX_MOVES; ++i) {
-    const newSolution = sudoku.concat([randomMove(sudoku)]);
-    if (!isValid(restrictions, newSolution)) {
-      continue;
-    }
 
-    console.log("New solution", newSolution);
-    if (newSolution.length > 53) {
-      console.log("Solution", newSolution);
-    }
-
-    if (newSolution.length === 81) {
-      return newSolution;
-    }
-
-    let solution = solve(restrictions, newSolution);
-    if (solution != null) {
-      return solution;
-    }
-  }
-  return null;
-}
-
-function getPositionKey(move) {
-  return move.slice(0, 2).toString();
-}
-
-function getRowKey(move) {
-  return [move[1], move[2]].toString();
-}
-
-function getColumnKey(move) {
-  return [move[0], move[2]].toString();
-}
-
-function getBoxKey(move) {
-  const box = Math.floor(move[0] / 3) + 3 * (Math.floor(move[1] / 3));
-  return [box, move[2]].toString();
-}
-
-function sudokuRestriction(keyFunction) {
-  function restriction(sudoku) {
-    const keys = new Set();
-
-    for (const move of sudoku) {
-      const key = keyFunction(move);
-      if (keys.has(key)) {
-        return false;
+function rowRestriction(fixedPoints) {
+  const possible = allPossible.slice();
+  for (const [i, value] of fixedPoints) {
+    const row = Math.floor(i/9);
+    let valueBinary = 1 << (value - 1);
+    const notValue = allNumbers - valueBinary;
+    for (let j=row*9; j<(row+1)*9; ++j) {
+      if (j === i) {
+        possible[j] = valueBinary;
+      } else {
+        possible[j] &= notValue;
       }
-      keys.add(key);
     }
-
-    return true;
   }
-
-  return restriction;
+  return possible;
 }
 
-const positionRestriction = sudokuRestriction(getPositionKey);
-const rowRestriction = sudokuRestriction(getRowKey);
-const columnRestriction = sudokuRestriction(getColumnKey)
-const boxRestriction = sudokuRestriction(getBoxKey)
 
-function sudokuRestrictions() {
-  return [positionRestriction, rowRestriction, columnRestriction, boxRestriction];
+
+function test() {
+  let restrictions = [rowRestriction];
+  let fixedPoints = [[4,5], [0,3]];
+  let possible = getPossible(restrictions, fixedPoints);
+  console.log("Possible", possible);
 }
