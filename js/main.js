@@ -61,15 +61,18 @@ function binaryToArray(binary) {
 
 const MAX_DEPTH = 2;
 
-function getPossible(restrictions, solution, previousPossible, maxDepth) {
-  const possible = allPossible.slice();
-
+function applyRestrictions(restrictions, solution, possible) {
   for (const restriction of restrictions) {
     const restrictionPossible = restriction(solution);
-    for (let i=0; i<possible.length; ++i) {
+    for (let i = 0; i < possible.length; ++i) {
       possible[i] &= restrictionPossible[i];
     }
   }
+}
+
+function getPossible(restrictions, solution, previousPossible, maxDepth) {
+  const possible = allPossible.slice();
+  applyRestrictions(restrictions, solution, possible);
   if (maxDepth === MAX_DEPTH) {
     console.log("After initial restriction");
     printPossible(possible);
@@ -96,6 +99,7 @@ function getPossible(restrictions, solution, previousPossible, maxDepth) {
         console.log("Found single possibility", maxDepth, i, possibility);
       }
       newSolution.push([i, possibility]);
+      applyRestrictions(restrictions, newSolution, possible);
     }
   }
 
