@@ -38,9 +38,9 @@ for (let i=0; i<81; ++i) {
 
 let nearlySolved = new Set();
 for (let i=0; i<9; ++i) {
-  for (let j=i+1; j<9; ++j) {
-    for (let k=j+1; k<9; ++k) {
-      const value = (1 << i) | (1 << j) | (i << k);
+  for (let j=0; j<9; ++j) {
+    for (let k=0; k<9; ++k) {
+      const value = (1 << i) | (1 << j) | (1 << k);
       nearlySolved.add(value);
     }
   }
@@ -59,6 +59,7 @@ function binaryToArray(binary) {
   return result;
 }
 
+const MAX_DEPTH = 2;
 
 function getPossible(restrictions, solution, previousPossible, maxDepth) {
   const possible = allPossible.slice();
@@ -68,12 +69,8 @@ function getPossible(restrictions, solution, previousPossible, maxDepth) {
     for (let i=0; i<possible.length; ++i) {
       possible[i] &= restrictionPossible[i];
     }
-    if (maxDepth === 3) {
-      console.log("Restrict");
-      printPossible(possible);
-    }
   }
-  if (maxDepth === 3) {
+  if (maxDepth === MAX_DEPTH) {
     console.log("After initial restriction");
     printPossible(possible);
   }
@@ -88,14 +85,14 @@ function getPossible(restrictions, solution, previousPossible, maxDepth) {
     if (restriction == null) {
       break;
     }
-    if (maxDepth === 3) {
+    if (maxDepth === MAX_DEPTH) {
       console.log("Found restriction", maxDepth, restriction);
     }
     const [i, decimal] = restriction;
     possible[i] &= ~(1 << (decimal - 1));
     if (singlePossibilities.has(possible[i])) {
       const possibility = singlePossibilities.get(possible[i]);
-      if (maxDepth === 3) {
+      if (maxDepth === MAX_DEPTH) {
         console.log("Found single possibility", maxDepth, i, possibility);
       }
       newSolution.push([i, possibility]);
@@ -107,7 +104,7 @@ function getPossible(restrictions, solution, previousPossible, maxDepth) {
 
 
 function searchRestriction(restrictions, solution, possible, previousPossible, maxDepth) {
-    for (let i=0; i<possible.length; ++i) {
+  for (let i=0; i<possible.length; ++i) {
     if (nearlySolved.has(possible[i]) && previousPossible[i] !== possible[i]) {
       let decimals = binaryToArray(possible[i]);
       for (const decimal of decimals) {
@@ -224,7 +221,7 @@ function test() {
     [66, 4], [67, 1], [68, 9], [71, 5],
     [76, 8], [79, 7], [80, 9]
   ]
-  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), 3);
+  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
   printPossible(possible);
 }
 
