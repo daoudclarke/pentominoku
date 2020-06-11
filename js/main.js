@@ -165,11 +165,16 @@ function columnRestriction(fixedPoints) {
 }
 
 
+function getColumnRow(i) {
+  const column = i % 9;
+  const row = (i - column) / 9;
+  return [column, row];
+}
+
 function boxRestriction(fixedPoints) {
   const possible = allPossible.slice();
   for (const [i, value] of fixedPoints) {
-    const column = i % 9;
-    const row = (i - column)/9;
+    const {column, row} = getColumnRow(i);
     const firstRow = row - (row % 3);
     const firstColumn = column - (column % 3);
     // console.log("First row column", row, column, firstRow, firstColumn);
@@ -183,6 +188,25 @@ function boxRestriction(fixedPoints) {
         } else {
           possible[j] &= notValue;
         }
+      }
+    }
+  }
+  return possible;
+}
+
+
+function knightsMoveRestriction(fixedPoints) {
+  const possible = allPossible.slice();
+  const knightsDifferences = [-11, -19, -17, -7, 11, 19, 17, 7]
+  for (const [i, value] of fixedPoints) {
+    const [iColumn, iRow] = getColumnRow(i);
+    const notValue = ~(1 << (value - 1));
+    for (const difference of knightsDifferences) {
+      const j = i + difference;
+      const [jColumn, jRow] = getColumnRow(j);
+      console.log("J", jColumn, jRow, iColumn, iRow);
+      if (j >= 0 && j < 81 && Math.max(Math.abs(jColumn - iColumn), Math.abs(jRow - iRow)) <=2) {
+        possible[j] &= notValue;
       }
     }
   }
@@ -208,6 +232,13 @@ function testColumn() {
 function testBox() {
   let restrictions = [boxRestriction];
   let fixedPoints = [[33,5]];
+  let possible = getPossible(restrictions, fixedPoints);
+  printPossible(possible);
+}
+
+function testKnightsMove() {
+  let restrictions = [knightsMoveRestriction];
+  let fixedPoints = [[0, 1], [33, 5]];
   let possible = getPossible(restrictions, fixedPoints);
   printPossible(possible);
 }
