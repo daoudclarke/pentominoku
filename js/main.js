@@ -318,6 +318,14 @@ function test() {
   printPossible(possible);
 }
 
+function testMiracle() {
+  const restrictions = [rowRestriction, columnRestriction, boxRestriction, knightsMoveRestriction,
+    kingsMoveRestriction, orthogonalConsecutiveRestriction];
+  const fixedPoints = [[38, 1], [51, 2]];
+  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  printPossible(possible);
+}
+
 function printPossible(possible) {
   console.log("Possible");
   for (let i=0; i<81; i+=9) {
