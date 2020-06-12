@@ -1,8 +1,3 @@
-// const {allNumbers, allPossible} = require('./possible');
-
-// import {allPossible} from "./possible";
-// allPossible = require('./possible');
-
 import {allPossible} from './possible';
 import {expect} from "@jest/globals";
 
