@@ -174,7 +174,7 @@ function getColumnRow(i) {
 function boxRestriction(fixedPoints) {
   const possible = allPossible.slice();
   for (const [i, value] of fixedPoints) {
-    const {column, row} = getColumnRow(i);
+    const [column, row] = getColumnRow(i);
     const firstRow = row - (row % 3);
     const firstColumn = column - (column % 3);
     // console.log("First row column", row, column, firstRow, firstColumn);
