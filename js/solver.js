@@ -1,4 +1,4 @@
-import {allPossible} from "./possible";
+import {allNumbers, allPossible} from "./possible";
 import {
   boxRestriction,
   columnRestriction,
@@ -112,14 +112,15 @@ function searchRestriction(restrictions, solution, possible, previousPossible, m
     return null;
 }
 
-function testRow() {
+export function testRow() {
     let restrictions = [rowRestriction];
     let fixedPoints = [[4, 5], [0, 3]];
-    let possible = getPossible(restrictions, fixedPoints);
+    let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
     console.log("Possible", possible);
+    printPossible(possible);
 }
 
-function testColumn() {
+export function testColumn() {
     let restrictions = [columnRestriction];
     let fixedPoints = [[4, 5], [0, 3]];
     let possible = getPossible(restrictions, fixedPoints);
@@ -181,8 +182,8 @@ function testMiracle() {
 }
 
 function printPossible(possible) {
-    console.log("Possible");
-    for (let i = 0; i < 81; i += 9) {
-        console.log(possible.slice(i, i + 9).map(x => binaryToArray(x).toString()));
-    }
+  console.log("Possible");
+    // for (let i = 0; i < 81; i += 9) {
+  console.log(possible.map(x => binaryToArray(allNumbers - x).toString()));
+    // }
 }

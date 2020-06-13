@@ -1,8 +1,8 @@
-import {test} from "./solver";
+import {test, testRow} from "./solver";
 
 
 
 
 
 
-test();
+testRow();

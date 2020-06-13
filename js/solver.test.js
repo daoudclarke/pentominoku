@@ -1,5 +1,5 @@
 import {boxRestriction, columnRestriction, rowRestriction} from "./restrictions";
-import {allPossible} from "./possible";
+import {allNumbers, allPossible} from "./possible";
 import {expect} from "@jest/globals";
 import {binaryToArray, getPossible, MAX_DEPTH} from "./solver";
 
@@ -31,3 +31,25 @@ test('simple sudoku can be solved', () => {
   ]
   expect(possibleArray).toEqual(expected);
 });
+
+test('row restriction works', () => {
+  let restrictions = [rowRestriction];
+  let fixedPoints = [[4, 5], [0, 3]];
+
+  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
+
+  const expected = [
+    "1,2,4,5,6,7,8,9", "3,5", "3,5", "3,5", "1,2,3,4,6,7,8,9", "3,5", "3,5", "3,5", "3,5",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", ""
+  ]
+
+  expect(possibleArray).toEqual(expected);
+})
