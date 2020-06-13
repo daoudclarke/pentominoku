@@ -119,7 +119,7 @@ export function testKnightsMove() {
     printPossible(possible);
 }
 
-function testKingsMove() {
+export function testKingsMove() {
     let restrictions = [kingsMoveRestriction];
     let fixedPoints = [[0, 1], [33, 5]];
     let possible = getPossible(restrictions, fixedPoints);

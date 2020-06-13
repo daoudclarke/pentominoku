@@ -1,5 +1,5 @@
-import {test, testKnightsMove} from "./solver";
+import {test, testKingsMove, testKnightsMove} from "./solver";
 
 
 
-testKnightsMove();
+testKingsMove();
