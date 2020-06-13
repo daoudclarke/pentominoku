@@ -2,7 +2,7 @@ import {
   boxRestriction,
   columnRestriction,
   kingsMoveRestriction,
-  knightsMoveRestriction,
+  knightsMoveRestriction, orthogonalConsecutiveRestriction,
   rowRestriction
 } from "./restrictions";
 import {allNumbers, allPossible} from "./possible";
@@ -139,6 +139,28 @@ test('test kings move', () => {
     "", "", "", "", "", "5", "5", "5", "",
     "", "", "", "", "", "5", "", "5", "",
     "", "", "", "", "", "5", "5", "5", "",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", ""
+  ]
+
+  expect(possibleArray).toEqual(expected);
+})
+
+test('test orthogonal consecutive restriction', () => {
+  let restrictions = [orthogonalConsecutiveRestriction];
+  let fixedPoints = [[0, 1], [33, 5]];
+
+  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
+
+  const expected = [
+    "", "2", "", "", "", "", "", "", "",
+    "2", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "4,6", "", "",
+    "", "", "", "", "", "4,6", "", "4,6", "",
+    "", "", "", "", "", "", "4,6", "", "",
     "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "",

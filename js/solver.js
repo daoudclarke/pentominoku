@@ -126,7 +126,7 @@ export function testKingsMove() {
     printPossible(possible);
 }
 
-function testOrthogonalConsecutive() {
+export function testOrthogonalConsecutive() {
     let restrictions = [orthogonalConsecutiveRestriction];
     let fixedPoints = [[0, 1], [33, 5]];
     let possible = getPossible(restrictions, fixedPoints);
