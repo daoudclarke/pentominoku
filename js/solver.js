@@ -1,4 +1,4 @@
-import {allNumbers, allPossible, singlePossibilities} from "./possible";
+import {allPossible, binaryToArray, printPossible, singlePossibilities} from "./possible";
 import {boxRestriction, columnRestriction, rowRestriction} from "./restrictions";
 
 export let nearlySolved = new Set();
@@ -13,17 +13,6 @@ for (let i=0; i<9; ++i) {
 }
 console.log("Nearly solved", nearlySolved);
 
-
-export function binaryToArray(binary) {
-    const result = [];
-    for (let i = 0; i < 9; ++i) {
-        if ((binary & 1) === 1) {
-            result.push(i + 1);
-        }
-        binary = binary >> 1;
-    }
-    return result;
-}
 
 export const MAX_DEPTH = 2;
 
@@ -43,7 +32,10 @@ export function getPossible(restrictions, solution, previousPossible, maxDepth) 
       possible[i] = 1 << (decimal - 1);
     }
 
-    applyRestrictions(restrictions, possible);
+    // for (let i=0; i<3; ++i) {
+      applyRestrictions(restrictions, possible);
+    // }
+
     if (maxDepth === MAX_DEPTH) {
         console.log("After initial restriction");
         printPossible(possible);
@@ -115,9 +107,3 @@ export function test() {
     printPossible(possible);
 }
 
-function printPossible(possible) {
-  console.log("Possible");
-    // for (let i = 0; i < 81; i += 9) {
-  console.log(possible.map(x => binaryToArray(allNumbers - x).toString()));
-    // }
-}

@@ -5,9 +5,9 @@ import {
   knightsMoveRestriction, orthogonalConsecutiveRestriction,
   rowRestriction
 } from "./restrictions";
-import {allNumbers, allPossible} from "./possible";
+import {allNumbers, allPossible, binaryToArray} from "./possible";
 import {expect} from "@jest/globals";
-import {binaryToArray, getPossible, MAX_DEPTH} from "./solver";
+import {getPossible, MAX_DEPTH} from "./solver";
 
 
 test('simple sudoku can be solved', () => {
@@ -59,6 +59,29 @@ test('row restriction works', () => {
 
   expect(possibleArray).toEqual(expected);
 })
+
+test('row elimination works', () => {
+  let restrictions = [columnRestriction, rowRestriction];
+  let fixedPoints = [[9, 5], [19, 5], [29, 5], [39, 5], [49, 5], [59, 5], [69, 5], [79, 5]];
+
+  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
+
+  const expected = [
+    "5", "5", "5", "5", "5", "5", "5", "5", "1,2,3,4,6,7,8,9",
+    "1,2,3,4,6,7,8,9", "5", "5", "5", "5", "5", "5", "5", "5",
+    "5", "1,2,3,4,6,7,8,9", "5", "5", "5", "5", "5", "5", "5",
+    "5", "5", "1,2,3,4,6,7,8,9", "5", "5", "5", "5", "5", "5",
+    "5", "5", "5", "1,2,3,4,6,7,8,9", "5", "5", "5", "5", "5",
+    "5", "5", "5", "5", "1,2,3,4,6,7,8,9", "5", "5", "5", "5",
+    "5", "5", "5", "5", "5", "1,2,3,4,6,7,8,9", "5", "5", "5",
+    "5", "5", "5", "5", "5", "5", "1,2,3,4,6,7,8,9", "5", "5",
+    "5", "5", "5", "5", "5", "5", "5", "1,2,3,4,6,7,8,9", "5"
+  ]
+
+  expect(possibleArray).toEqual(expected);
+})
+
 
 test('column restriction works', () => {
   let restrictions = [columnRestriction];

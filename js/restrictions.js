@@ -1,4 +1,4 @@
-import {allNumbers, allPossible, singlePossibilities} from "./possible";
+import {allNumbers, allPossible, printPossible, singlePossibilities} from "./possible";
 
 function getFixedPoints(currentPossible) {
   const fixedPoints = [];
@@ -13,7 +13,7 @@ function getFixedPoints(currentPossible) {
 
 export function rowRestriction(currentPossible) {
   const fixedPoints = getFixedPoints(currentPossible);
-    const possible = allPossible.slice();
+    const possible = currentPossible.slice();
     for (const [i, value] of fixedPoints) {
         const row = Math.floor(i / 9);
         let valueBinary = 1 << (value - 1);
@@ -26,6 +26,29 @@ export function rowRestriction(currentPossible) {
             }
         }
     }
+
+    // printPossible(possible);
+    for (let i=0; i<possible.length; ++i) {
+      const row = Math.floor(i / 9);
+
+      let otherValues = 0;
+      for (let j = row * 9; j < (row + 1) * 9; ++j) {
+        if (j !== i) {
+          // if (row === 0) {
+          //   console.log("i j", i, j, possible[j]);
+          // }
+          otherValues |= possible[j];
+        }
+      }
+
+      // if (row === 0 ) {
+      //   console.log("Possible i", i, possible[i], otherValues);
+      // }
+      if ((possible[i] & ~otherValues) !== 0) {
+        possible[i] = ~otherValues & possible[i];
+      }
+    }
+
     return possible;
 }
 
