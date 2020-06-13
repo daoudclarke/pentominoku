@@ -112,30 +112,7 @@ function searchRestriction(restrictions, solution, possible, previousPossible, m
     return null;
 }
 
-export function testRow() {
-    let restrictions = [rowRestriction];
-    let fixedPoints = [[4, 5], [0, 3]];
-    let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
-    console.log("Possible", possible);
-    printPossible(possible);
-}
-
-export function testColumn() {
-    let restrictions = [columnRestriction];
-    let fixedPoints = [[4, 5], [0, 3]];
-    let possible = getPossible(restrictions, fixedPoints);
-    // console.log("Possible", possible);
-    printPossible(possible);
-}
-
-function testBox() {
-    let restrictions = [boxRestriction];
-    let fixedPoints = [[33, 5]];
-    let possible = getPossible(restrictions, fixedPoints);
-    printPossible(possible);
-}
-
-function testKnightsMove() {
+export function testKnightsMove() {
     let restrictions = [knightsMoveRestriction];
     let fixedPoints = [[0, 1], [33, 5]];
     let possible = getPossible(restrictions, fixedPoints);

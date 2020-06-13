@@ -1,4 +1,4 @@
-import {boxRestriction, columnRestriction, rowRestriction} from "./restrictions";
+import {boxRestriction, columnRestriction, knightsMoveRestriction, rowRestriction} from "./restrictions";
 import {allNumbers, allPossible} from "./possible";
 import {expect} from "@jest/globals";
 import {binaryToArray, getPossible, MAX_DEPTH} from "./solver";
@@ -94,6 +94,28 @@ test('box restriction works', () => {
         '', '', '', '', '', '', '', '', '',
         '', '', '', '', '', '', '', '', ''
       ]
+
+  expect(possibleArray).toEqual(expected);
+})
+
+test('test knights move', () => {
+  let restrictions = [knightsMoveRestriction];
+  let fixedPoints = [[0, 1], [33, 5]];
+
+  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
+
+  const expected = [
+    "", "", "", "", "", "", "", "", "",
+    "", "", "1", "", "", "5", "", "5", "",
+    "", "1", "", "", "5", "", "", "", "5",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "5", "", "", "", "5",
+    "", "", "", "", "", "5", "", "5", "",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "", ""
+  ]
 
   expect(possibleArray).toEqual(expected);
 })
