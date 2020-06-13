@@ -1,6 +1,18 @@
-import {allNumbers, allPossible} from "./possible";
+import {allNumbers, allPossible, singlePossibilities} from "./possible";
 
-export function rowRestriction(fixedPoints) {
+function getFixedPoints(currentPossible) {
+  const fixedPoints = [];
+  for (let i=0; i<currentPossible.length; ++i) {
+    if (singlePossibilities.has(currentPossible[i])) {
+      fixedPoints.push([i, singlePossibilities.get(currentPossible[i])])
+    }
+  }
+  // console.log("Fixed points", fixedPoints);
+  return fixedPoints;
+}
+
+export function rowRestriction(currentPossible) {
+  const fixedPoints = getFixedPoints(currentPossible);
     const possible = allPossible.slice();
     for (const [i, value] of fixedPoints) {
         const row = Math.floor(i / 9);
@@ -17,7 +29,8 @@ export function rowRestriction(fixedPoints) {
     return possible;
 }
 
-export function columnRestriction(fixedPoints) {
+export function columnRestriction(currentPossible) {
+  const fixedPoints = getFixedPoints(currentPossible);
     const possible = allPossible.slice();
     for (const [i, value] of fixedPoints) {
         const column = i % 9;
@@ -40,7 +53,8 @@ function getColumnRow(i) {
     return [column, row];
 }
 
-export function boxRestriction(fixedPoints) {
+export function boxRestriction(currentPossible) {
+  const fixedPoints = getFixedPoints(currentPossible);
     const possible = allPossible.slice();
     for (const [i, value] of fixedPoints) {
         const [column, row] = getColumnRow(i);
@@ -63,7 +77,8 @@ export function boxRestriction(fixedPoints) {
     return possible;
 }
 
-export function knightsMoveRestriction(fixedPoints) {
+export function knightsMoveRestriction(currentPossible) {
+  const fixedPoints = getFixedPoints(currentPossible);
     const possible = allPossible.slice();
     const knightsDifferences = [-11, -19, -17, -7, 11, 19, 17, 7]
     for (const [i, value] of fixedPoints) {
@@ -80,7 +95,8 @@ export function knightsMoveRestriction(fixedPoints) {
     return possible;
 }
 
-export function kingsMoveRestriction(fixedPoints) {
+export function kingsMoveRestriction(currentPossible) {
+  const fixedPoints = getFixedPoints(currentPossible);
     const possible = allPossible.slice();
     const knightsDifferences = [-10, -9, -8, -1, 1, 8, 9, 10];
     for (const [i, value] of fixedPoints) {
@@ -97,7 +113,8 @@ export function kingsMoveRestriction(fixedPoints) {
     return possible;
 }
 
-export function orthogonalConsecutiveRestriction(fixedPoints) {
+export function orthogonalConsecutiveRestriction(currentPossible) {
+  const fixedPoints = getFixedPoints(currentPossible);
     const possible = allPossible.slice();
     const consecutiveDifferences = [-9, -1, 1, 9];
     for (const [i, value] of fixedPoints) {

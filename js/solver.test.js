@@ -112,10 +112,10 @@ test('test knights move', () => {
   const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
 
   const expected = [
-    "", "", "", "", "", "", "", "", "",
+    "2,3,4,5,6,7,8,9", "", "", "", "", "", "", "", "",
     "", "", "1", "", "", "5", "", "5", "",
     "", "1", "", "", "5", "", "", "", "5",
-    "", "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "1,2,3,4,6,7,8,9", "", "",
     "", "", "", "", "5", "", "", "", "5",
     "", "", "", "", "", "5", "", "5", "",
     "", "", "", "", "", "", "", "", "",
@@ -134,10 +134,10 @@ test('test kings move', () => {
   const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
 
   const expected = [
-    "", "1", "", "", "", "", "", "", "",
+    "2,3,4,5,6,7,8,9", "1", "", "", "", "", "", "", "",
     "1", "1", "", "", "", "", "", "", "",
     "", "", "", "", "", "5", "5", "5", "",
-    "", "", "", "", "", "5", "", "5", "",
+    "", "", "", "", "", "5", "1,2,3,4,6,7,8,9", "5", "",
     "", "", "", "", "", "5", "5", "5", "",
     "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "",
@@ -156,10 +156,10 @@ test('test orthogonal consecutive restriction', () => {
   const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
 
   const expected = [
-    "", "2", "", "", "", "", "", "", "",
+    "2,3,4,5,6,7,8,9", "2", "", "", "", "", "", "", "",
     "2", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "4,6", "", "",
-    "", "", "", "", "", "4,6", "", "4,6", "",
+    "", "", "", "", "", "4,6", "1,2,3,4,6,7,8,9", "4,6", "",
     "", "", "", "", "", "", "4,6", "", "",
     "", "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "", "",
@@ -169,3 +169,14 @@ test('test orthogonal consecutive restriction', () => {
 
   expect(possibleArray).toEqual(expected);
 })
+
+// test('test miracle sudoku', () => {
+//   const restrictions = [rowRestriction, columnRestriction, boxRestriction, knightsMoveRestriction,
+//     kingsMoveRestriction, orthogonalConsecutiveRestriction];
+//   const fixedPoints = [[38, 1], [51, 2]];
+//
+//   let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+//   const possibleArray = possible.map(x => binaryToArray(x).length)
+//   console.log("Possible array", possibleArray);
+//   expect(possibleArray.every((x) => (x === 1))).toBe(true);
+// })

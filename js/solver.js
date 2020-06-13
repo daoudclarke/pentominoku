@@ -1,24 +1,5 @@
-import {allNumbers, allPossible} from "./possible";
-import {
-  boxRestriction,
-  columnRestriction,
-  kingsMoveRestriction,
-  knightsMoveRestriction,
-  orthogonalConsecutiveRestriction,
-  rowRestriction
-} from "./restrictions";
-
-export let singlePossibilities = new Map();
-
-singlePossibilities.set(1, 1);
-singlePossibilities.set(2, 2);
-singlePossibilities.set(4, 3);
-singlePossibilities.set(8, 4);
-singlePossibilities.set(16, 5);
-singlePossibilities.set(32, 6);
-singlePossibilities.set(64, 7);
-singlePossibilities.set(128, 8);
-singlePossibilities.set(256, 9);
+import {allNumbers, allPossible, singlePossibilities} from "./possible";
+import {boxRestriction, columnRestriction, rowRestriction} from "./restrictions";
 
 export let nearlySolved = new Set();
 
@@ -46,9 +27,9 @@ export function binaryToArray(binary) {
 
 export const MAX_DEPTH = 2;
 
-function applyRestrictions(restrictions, solution, possible) {
+function applyRestrictions(restrictions, possible) {
     for (const restriction of restrictions) {
-        const restrictionPossible = restriction(solution);
+        const restrictionPossible = restriction(possible);
         for (let i = 0; i < possible.length; ++i) {
             possible[i] &= restrictionPossible[i];
         }
@@ -57,7 +38,12 @@ function applyRestrictions(restrictions, solution, possible) {
 
 export function getPossible(restrictions, solution, previousPossible, maxDepth) {
     const possible = allPossible.slice();
-    applyRestrictions(restrictions, solution, possible);
+
+    for (const [i, decimal] of solution) {
+      possible[i] = 1 << (decimal - 1);
+    }
+
+    applyRestrictions(restrictions, possible);
     if (maxDepth === MAX_DEPTH) {
         console.log("After initial restriction");
         printPossible(possible);
@@ -84,7 +70,7 @@ export function getPossible(restrictions, solution, previousPossible, maxDepth) 
                 console.log("Found single possibility", maxDepth, i, possibility);
             }
             newSolution.push([i, possibility]);
-            applyRestrictions(restrictions, newSolution, possible);
+            applyRestrictions(restrictions, possible);
         }
     }
 
@@ -112,27 +98,6 @@ function searchRestriction(restrictions, solution, possible, previousPossible, m
     return null;
 }
 
-export function testKnightsMove() {
-    let restrictions = [knightsMoveRestriction];
-    let fixedPoints = [[0, 1], [33, 5]];
-    let possible = getPossible(restrictions, fixedPoints);
-    printPossible(possible);
-}
-
-export function testKingsMove() {
-    let restrictions = [kingsMoveRestriction];
-    let fixedPoints = [[0, 1], [33, 5]];
-    let possible = getPossible(restrictions, fixedPoints);
-    printPossible(possible);
-}
-
-export function testOrthogonalConsecutive() {
-    let restrictions = [orthogonalConsecutiveRestriction];
-    let fixedPoints = [[0, 1], [33, 5]];
-    let possible = getPossible(restrictions, fixedPoints);
-    printPossible(possible);
-}
-
 export function test() {
     let restrictions = [rowRestriction, columnRestriction, boxRestriction];
     // let fixedPoints = [[33,5]];
@@ -146,14 +111,6 @@ export function test() {
         [66, 4], [67, 1], [68, 9], [71, 5],
         [76, 8], [79, 7], [80, 9]
     ]
-    let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
-    printPossible(possible);
-}
-
-function testMiracle() {
-    const restrictions = [rowRestriction, columnRestriction, boxRestriction, knightsMoveRestriction,
-        kingsMoveRestriction, orthogonalConsecutiveRestriction];
-    const fixedPoints = [[38, 1], [51, 2]];
     let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
     printPossible(possible);
 }

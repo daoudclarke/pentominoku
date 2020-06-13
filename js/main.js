@@ -2,4 +2,4 @@ import {test, testKingsMove, testKnightsMove, testOrthogonalConsecutive} from ".
 
 
 
-testOrthogonalConsecutive();
+test();
