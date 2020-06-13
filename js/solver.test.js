@@ -53,3 +53,25 @@ test('row restriction works', () => {
 
   expect(possibleArray).toEqual(expected);
 })
+
+test('column restriction works', () => {
+  let restrictions = [columnRestriction];
+  let fixedPoints = [[4, 5], [0, 3]];
+
+  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
+
+  const expected = [
+        '1,2,4,5,6,7,8,9', '',  '', '', '1,2,3,4,6,7,8,9', '',  '',  '', '',
+        '3', '',  '', '', '5', '', '', '', '',
+        '3', '',  '', '', '5', '', '', '', '',
+        '3', '',  '', '', '5', '', '', '', '',
+        '3', '',  '', '', '5', '', '', '', '',
+        '3', '',  '', '', '5', '', '', '', '',
+        '3', '',  '', '', '5', '', '', '', '',
+        '3', '',  '', '', '5', '', '', '', '',
+        '3', '',  '', '', '5', '', '', '', ''
+      ]
+
+  expect(possibleArray).toEqual(expected);
+})
