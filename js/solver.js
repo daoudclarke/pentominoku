@@ -25,6 +25,19 @@ function applyRestrictions(restrictions, possible) {
     }
 }
 
+
+function arraysEqual(a, b) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length !== b.length) return false;
+
+  for (let i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+
 export function getPossible(restrictions, solution, previousPossible, maxDepth) {
     const possible = allPossible.slice();
 
@@ -32,9 +45,13 @@ export function getPossible(restrictions, solution, previousPossible, maxDepth) 
       possible[i] = 1 << (decimal - 1);
     }
 
-    // for (let i=0; i<3; ++i) {
-      applyRestrictions(restrictions, possible);
-    // }
+  while (true) {
+    const oldPossible = possible.slice();
+    applyRestrictions(restrictions, possible);
+    if (arraysEqual(oldPossible, possible)) {
+      break;
+    }
+  }
 
     if (maxDepth === MAX_DEPTH) {
         console.log("After initial restriction");

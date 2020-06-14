@@ -29,7 +29,9 @@ export function binaryToArray(binary) {
 
 export function printPossible(possible) {
   console.log("Possible");
-  // for (let i = 0; i < 81; i += 9) {
-  console.log(possible.map(x => binaryToArray(allNumbers - x).toString()));
-  // }
+  const slices = [];
+  for (let i = 0; i < 81; i += 9) {
+    slices.push(possible.slice(i, i + 9).map(x => binaryToArray(x).join('').padStart(9, ' ')).join(' '));
+  }
+  console.log(slices.join('\n'));
 }
