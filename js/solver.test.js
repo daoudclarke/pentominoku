@@ -23,7 +23,7 @@ test('simple sudoku can be solved', () => {
     [66, 4], [67, 1], [68, 9], [71, 5],
     [76, 8], [79, 7], [80, 9]
   ]
-  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  let possible = getPossible(restrictions, fixedPoints);
   const possibleArray = possible.map(x => binaryToArray(x).toString())
   const expected = [
     "5", "3", "4", "6", "7", "8", "9", "1", "2",
@@ -43,7 +43,7 @@ test('row restriction works', () => {
   let restrictions = [rowRestriction];
   let fixedPoints = [[4, 5], [0, 3]];
 
-  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  let possible = getPossible(restrictions, fixedPoints);
   const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
 
   const expected = [
@@ -65,7 +65,7 @@ test('row elimination works', () => {
   let restrictions = [columnRestriction, rowRestriction];
   let fixedPoints = [[9, 5], [19, 5], [29, 5], [39, 5], [49, 5], [59, 5], [69, 5], [79, 5]];
 
-  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  let possible = getPossible(restrictions, fixedPoints);
   const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
 
   const expected = [
@@ -88,7 +88,7 @@ test('column restriction works', () => {
   let restrictions = [columnRestriction];
   let fixedPoints = [[4, 5], [0, 3]];
 
-  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  let possible = getPossible(restrictions, fixedPoints);
   const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
 
   const expected = [
@@ -110,7 +110,7 @@ test('box restriction works', () => {
   let restrictions = [boxRestriction];
   let fixedPoints = [[33, 5]];
 
-  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  let possible = getPossible(restrictions, fixedPoints);
   const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
 
   const expected = [
@@ -132,7 +132,7 @@ test('test knights move', () => {
   let restrictions = [knightsMoveRestriction];
   let fixedPoints = [[0, 1], [33, 5]];
 
-  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  let possible = getPossible(restrictions, fixedPoints);
   const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
 
   const expected = [
@@ -154,7 +154,7 @@ test('test kings move', () => {
   let restrictions = [kingsMoveRestriction];
   let fixedPoints = [[0, 1], [33, 5]];
 
-  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  let possible = getPossible(restrictions, fixedPoints);
   const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
 
   const expected = [
@@ -176,7 +176,7 @@ test('test orthogonal consecutive restriction', () => {
   let restrictions = [orthogonalConsecutiveRestriction];
   let fixedPoints = [[0, 1], [33, 5]];
 
-  let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+  let possible = getPossible(restrictions, fixedPoints);
   const possibleArray = possible.map(x => binaryToArray(allNumbers - x).toString())
 
   const expected = [
@@ -199,7 +199,7 @@ test('test orthogonal consecutive restriction', () => {
 //     kingsMoveRestriction, orthogonalConsecutiveRestriction];
 //   const fixedPoints = [[38, 1], [51, 2]];
 //
-//   let possible = getPossible(restrictions, fixedPoints, allPossible.slice(), MAX_DEPTH);
+//   let possible = getPossible(restrictions, fixedPoints);
 //   const possibleArray = possible.map(x => binaryToArray(x).length)
 //   console.log("Possible array", possibleArray);
 //   expect(possibleArray.every((x) => (x === 1))).toBe(true);
