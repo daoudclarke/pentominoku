@@ -1,4 +1,5 @@
 import {
+  atLeastRowRestriction, atMostRowRestriction,
   boxRestriction,
   columnRestriction,
   kingsMoveRestriction,

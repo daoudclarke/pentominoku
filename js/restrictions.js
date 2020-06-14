@@ -1,4 +1,4 @@
-import {allNumbers, allPossible, printPossible, singlePossibilities} from "./possible";
+import {allNumbers, allPossible, singlePossibilities} from "./possible";
 
 function getFixedPoints(currentPossible) {
   const fixedPoints = [];
@@ -11,39 +11,72 @@ function getFixedPoints(currentPossible) {
   return fixedPoints;
 }
 
-export function rowRestriction(currentPossible) {
-  const fixedPoints = getFixedPoints(currentPossible);
+
+function atMostRestriction(neighbours) {
+  function restriction(currentPossible) {
+    const fixedPoints = getFixedPoints(currentPossible);
     const possible = currentPossible.slice();
     for (const [i, value] of fixedPoints) {
-        const row = Math.floor(i / 9);
-        let valueBinary = 1 << (value - 1);
-        const notValue = allNumbers - valueBinary;
-        for (let j = row * 9; j < (row + 1) * 9; ++j) {
-            if (j === i) {
-                possible[j] = valueBinary;
-            } else {
-                possible[j] &= notValue;
-            }
-        }
+      let valueBinary = 1 << (value - 1);
+      const notValue = allNumbers - valueBinary;
+      for (const neighbour of neighbours[i]) {
+        possible[neighbour] &= notValue;
+      }
     }
+    return possible;
+  }
 
+  return restriction;
+}
+
+function atLeastRestriction(neighbours) {
+  function restriction(currentPossible) {
+    const possible = currentPossible.slice();
     for (let i=0; i<possible.length; ++i) {
-      const row = Math.floor(i / 9);
-
       let otherValues = 0;
-      for (let j = row * 9; j < (row + 1) * 9; ++j) {
-        if (j !== i) {
-          otherValues |= possible[j];
-        }
+      for (const neighbour of neighbours[i]) {
+          otherValues |= possible[neighbour];
       }
 
       if ((possible[i] & ~otherValues) !== 0) {
         possible[i] &= ~otherValues;
       }
     }
-
     return possible;
+  }
+
+  return restriction;
 }
+
+function rowNeighbours() {
+  const neighbours = [];
+  for (let i=0; i<81; ++i) {
+    const iNeighbours = [];
+    const row = Math.floor(i / 9);
+    for (let j = row * 9; j < (row + 1) * 9; ++j) {
+      if (j !== i) {
+        iNeighbours.push(j);
+      }
+    }
+    neighbours.push(iNeighbours);
+  }
+  return neighbours;
+}
+
+const rowNeighbourValues = rowNeighbours();
+function combinedRestriction(restrictions) {
+  function combined(possible) {
+    for (const restriction of restrictions) {
+      possible = restriction(possible);
+    }
+    return possible;
+  }
+  return combined;
+}
+
+export const rowRestriction = combinedRestriction(
+  [atLeastRestriction(rowNeighbourValues), atMostRestriction(rowNeighbourValues)])
+
 
 export function columnRestriction(currentPossible) {
   const fixedPoints = getFixedPoints(currentPossible);
