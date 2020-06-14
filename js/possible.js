@@ -35,3 +35,14 @@ export function printPossible(possible) {
   }
   console.log(slices.join('\n'));
 }
+
+export function getFixedPoints(currentPossible) {
+  const fixedPoints = [];
+  for (let i = 0; i < currentPossible.length; ++i) {
+    if (singlePossibilities.has(currentPossible[i])) {
+      fixedPoints.push([i, singlePossibilities.get(currentPossible[i])])
+    }
+  }
+  // console.log("Fixed points", fixedPoints);
+  return fixedPoints;
+}

@@ -1,4 +1,4 @@
-import {allPossible, binaryToArray, printPossible, singlePossibilities} from "./possible";
+import {allPossible, binaryToArray, getFixedPoints, printPossible, singlePossibilities} from "./possible";
 import {boxRestriction, columnRestriction, rowRestriction} from "./restrictions";
 
 export let nearlySolved = new Set();
@@ -45,27 +45,46 @@ export function getPossible(restrictions, solution) {
     possible[i] = 1 << (decimal - 1);
   }
 
-  return getPossibleInternal(restrictions, possible, MAX_DEPTH)
+  return getPossibleInternal(restrictions, possible, possible.slice(), MAX_DEPTH)
 }
 
-function getPossibleInternal(restrictions, possible, maxDepth) {
-
+function getPossibleInternal(restrictions, possible, previousPossible, maxDepth) {
   while (true) {
-    const oldPossible = possible.slice();
-    applyRestrictions(restrictions, possible);
-    if (arraysEqual(oldPossible, possible)) {
-      break;
+    while (true) {
+      const oldPossible = possible.slice();
+      applyRestrictions(restrictions, possible);
+      if (arraysEqual(oldPossible, possible)) {
+        break;
+      }
     }
-  }
 
     if (maxDepth === MAX_DEPTH) {
-        console.log("After initial restriction");
-        printPossible(possible);
+      console.log("After restriction");
+      printPossible(possible);
     }
 
     if (maxDepth === 0) {
-        return possible;
+      return possible;
     }
+
+    const restriction = searchRestriction(restrictions, possible, previousPossible, maxDepth);
+    if (restriction == null) {
+      break;
+    }
+    if (maxDepth === MAX_DEPTH) {
+      console.log("Found search restriction", maxDepth, restriction);
+    }
+    const [i, decimal] = restriction;
+    const binary = 1 << (decimal - 1);
+    possible[i] &= ~binary;
+    if (singlePossibilities.has(possible[i])) {
+      const possibility = singlePossibilities.get(possible[i]);
+      if (maxDepth === MAX_DEPTH) {
+        console.log("Found single possibility", maxDepth, i, possibility);
+      }
+      // possible[i] = binary;
+    }
+  }
 
     // const newSolution = solution.slice();
     // while (true) {
@@ -88,28 +107,38 @@ function getPossibleInternal(restrictions, possible, maxDepth) {
     //     }
     // }
 
-    return possible;
+  return possible;
 }
 
-function searchRestriction(restrictions, solution, possible, previousPossible, maxDepth) {
-    for (let i = 0; i < possible.length; ++i) {
-        if (nearlySolved.has(possible[i]) && previousPossible[i] !== possible[i]) {
-            let decimals = binaryToArray(possible[i]);
-            for (const decimal of decimals) {
-                const newSolution = solution.slice();
-                // console.log("Searching with additional possibility", maxDepth, i, decimal)
-                newSolution.push([i, decimal]);
-                const newPossible = getPossibleInternal(restrictions, possible, maxDepth - 1);
-                const minimumValue = Math.min(...newPossible);
-                if (minimumValue === 0) {
-                    // We can rule out this decimal from the actual solution
-                    return [i, decimal];
-                }
-            }
-        }
+function searchRestriction(restrictions, possible, previousPossible, maxDepth) {
+  console.log("Search restriction", maxDepth);
+  for (let i = 0; i < possible.length; ++i) {
+    // if (previousPossible[i] !== possible[i]) {
+    if (i === 73) {
+      console.log("Got 73");
     }
-    // console.log("Found no restriction", maxDepth);
-    return null;
+      let decimals = binaryToArray(possible[i]);
+      for (const decimal of decimals) {
+        // const newSolution = getFixedPoints(possible);
+        // // console.log("Searching with additional possibility", maxDepth, i, decimal)
+        // newSolution.push([i, decimal]);
+        const possibleCopy = possible.slice();
+        possibleCopy[i] = 1 << (decimal - 1);
+        const newPossible = getPossibleInternal(restrictions, possibleCopy, previousPossible, maxDepth - 1);
+        const minimumValue = Math.min(...newPossible);
+        // console.log("Searching", i, decimal, minimumValue);
+        if (minimumValue === 0) {
+          // We can rule out this decimal from the actual solution
+          // if (maxDepth === MAX_DEPTH) {
+          //   console.log("Found restriction", i, decimal);
+          // }
+          return [i, decimal];
+        }
+      }
+    // }
+  }
+  // console.log("Found no restriction", maxDepth);
+  return null;
 }
 
 export function test() {

@@ -194,13 +194,13 @@ test('test orthogonal consecutive restriction', () => {
   expect(possibleArray).toEqual(expected);
 })
 
-// test('test miracle sudoku', () => {
-//   const restrictions = [rowRestriction, columnRestriction, boxRestriction, knightsMoveRestriction,
-//     kingsMoveRestriction, orthogonalConsecutiveRestriction];
-//   const fixedPoints = [[38, 1], [51, 2]];
-//
-//   let possible = getPossible(restrictions, fixedPoints);
-//   const possibleArray = possible.map(x => binaryToArray(x).length)
-//   console.log("Possible array", possibleArray);
-//   expect(possibleArray.every((x) => (x === 1))).toBe(true);
-// })
+test('test miracle sudoku', () => {
+  const restrictions = [rowRestriction, columnRestriction, boxRestriction, knightsMoveRestriction,
+    kingsMoveRestriction, orthogonalConsecutiveRestriction];
+  const fixedPoints = [[38, 1], [51, 2]];
+
+  let possible = getPossible(restrictions, fixedPoints);
+  const possibleArray = possible.map(x => binaryToArray(x).length)
+  console.log("Possible array", possibleArray);
+  expect(possibleArray.every((x) => (x === 1))).toBe(true);
+})

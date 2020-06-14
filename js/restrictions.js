@@ -1,15 +1,4 @@
-import {allNumbers, allPossible, singlePossibilities} from "./possible";
-
-function getFixedPoints(currentPossible) {
-  const fixedPoints = [];
-  for (let i=0; i<currentPossible.length; ++i) {
-    if (singlePossibilities.has(currentPossible[i])) {
-      fixedPoints.push([i, singlePossibilities.get(currentPossible[i])])
-    }
-  }
-  // console.log("Fixed points", fixedPoints);
-  return fixedPoints;
-}
+import {allNumbers, allPossible, getFixedPoints} from "./possible";
 
 
 function atMostRestriction(neighbours) {
@@ -40,6 +29,10 @@ function atLeastRestriction(neighbours) {
 
       if ((possible[i] & ~otherValues) !== 0) {
         possible[i] &= ~otherValues;
+      }
+
+      if ((possible[i] | otherValues) !== allNumbers) {
+        possible[i] = 0;
       }
     }
     return possible;
