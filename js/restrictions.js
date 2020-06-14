@@ -63,7 +63,6 @@ function rowNeighbours() {
   return neighbours;
 }
 
-const rowNeighbourValues = rowNeighbours();
 function combinedRestriction(restrictions) {
   function combined(possible) {
     for (const restriction of restrictions) {
@@ -74,27 +73,29 @@ function combinedRestriction(restrictions) {
   return combined;
 }
 
+const rowNeighbourValues = rowNeighbours();
 export const rowRestriction = combinedRestriction(
   [atLeastRestriction(rowNeighbourValues), atMostRestriction(rowNeighbourValues)])
 
-
-export function columnRestriction(currentPossible) {
-  const fixedPoints = getFixedPoints(currentPossible);
-    const possible = allPossible.slice();
-    for (const [i, value] of fixedPoints) {
-        const column = i % 9;
-        let valueBinary = 1 << (value - 1);
-        const notValue = allNumbers - valueBinary;
-        for (let j = column; j < 81; j += 9) {
-            if (j === i) {
-                possible[j] = valueBinary;
-            } else {
-                possible[j] &= notValue;
-            }
-        }
+function columnNeighbours() {
+  const neighbours = [];
+  for (let i=0; i<81; ++i) {
+    const iNeighbours = [];
+    const column = i % 9;
+    for (let j = column; j < 81; j += 9) {
+      if (j !== i) {
+        iNeighbours.push(j);
+      }
     }
-    return possible;
+    neighbours.push(iNeighbours);
+  }
+  return neighbours;
 }
+
+const columnNeighbourValues = columnNeighbours();
+export const columnRestriction = combinedRestriction(
+  [atLeastRestriction(columnNeighbourValues), atMostRestriction(columnNeighbourValues)])
+
 
 function getColumnRow(i) {
     const column = i % 9;
@@ -102,29 +103,30 @@ function getColumnRow(i) {
     return [column, row];
 }
 
-export function boxRestriction(currentPossible) {
-  const fixedPoints = getFixedPoints(currentPossible);
-    const possible = allPossible.slice();
-    for (const [i, value] of fixedPoints) {
-        const [column, row] = getColumnRow(i);
-        const firstRow = row - (row % 3);
-        const firstColumn = column - (column % 3);
-        // console.log("First row column", row, column, firstRow, firstColumn);
-        let valueBinary = 1 << (value - 1);
-        const notValue = allNumbers - valueBinary;
-        for (let k = firstRow; k < firstRow + 3; ++k) {
-            for (let l = firstColumn; l < firstColumn + 3; ++l) {
-                const j = k * 9 + l;
-                if (j === i) {
-                    possible[j] = valueBinary;
-                } else {
-                    possible[j] &= notValue;
-                }
-            }
+function boxNeighbours() {
+  const neighbours = [];
+  for (let i=0; i<81; ++i) {
+    const iNeighbours = [];
+    const [column, row] = getColumnRow(i);
+    const firstRow = row - (row % 3);
+    const firstColumn = column - (column % 3);
+    for (let k = firstRow; k < firstRow + 3; ++k) {
+      for (let l = firstColumn; l < firstColumn + 3; ++l) {
+        const j = k * 9 + l;
+        if (j !== i) {
+          iNeighbours.push(j);
         }
+      }
     }
-    return possible;
+    neighbours.push(iNeighbours);
+  }
+  return neighbours;
 }
+
+const boxNeighbourValues = boxNeighbours();
+export const boxRestriction = combinedRestriction(
+  [atLeastRestriction(boxNeighbourValues), atMostRestriction(boxNeighbourValues)]
+)
 
 export function knightsMoveRestriction(currentPossible) {
   const fixedPoints = getFixedPoints(currentPossible);
