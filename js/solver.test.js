@@ -1,12 +1,12 @@
 import {
   atLeastRowRestriction, atMostRowRestriction,
   boxRestriction,
-  columnRestriction,
+  columnRestriction, getThermoRestriction,
   kingsMoveRestriction,
   knightsMoveRestriction, orthogonalConsecutiveRestriction,
   rowRestriction
 } from "./restrictions";
-import {allNumbers, allPossible, binaryToArray} from "./possible";
+import {allNumbers, allPossible, binaryToArray, getDisplay} from "./possible";
 import {expect} from "@jest/globals";
 import {getPossible, MAX_DEPTH} from "./solver";
 
@@ -192,6 +192,26 @@ test('test orthogonal consecutive restriction', () => {
   ]
 
   expect(possibleArray).toEqual(expected);
+})
+
+test('test thermo restriction', () => {
+  let restrictions = [getThermoRestriction([10, 11, 12, 13, 14])];
+  let fixedPoints = [];
+
+  const possible = getPossible(restrictions, fixedPoints);
+  const display = getDisplay(possible);
+
+  const expected = `123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789     12345     23456     34567     45678     56789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789`;
+
+  expect(display).toEqual(expected);
 })
 
 test('test miracle sudoku', () => {

@@ -1,4 +1,4 @@
-import {allNumbers, allPossible, getFixedPoints} from "./possible";
+import {allNumbers, allPossible, binaryToArray, getFixedPoints} from "./possible";
 
 
 function atMostRestriction(neighbours) {
@@ -182,3 +182,52 @@ export function orthogonalConsecutiveRestriction(currentPossible) {
     }
     return possible;
 }
+
+function getThermoMinBinaryValues() {
+  const values = [];
+
+  let restriction = 0;
+  for (let i=0; i<9; ++i) {
+    restriction += 1 << i;
+    values.push(allNumbers & ~restriction);
+  }
+  return values;
+}
+
+const thermoMinBinaryValues = getThermoMinBinaryValues();
+
+function getThermoMaxBinaryValues() {
+  const values = [];
+
+  let restriction = 0;
+  for (let i=8; i>=0; --i) {
+    restriction += 1 << i;
+    values.push(allNumbers & ~restriction);
+  }
+  return values.reverse();
+}
+
+const thermoMaxBinaryValues = getThermoMaxBinaryValues();
+
+export function getThermoRestriction(cells) {
+  function restriction(currentPossible) {
+    const possible = currentPossible.slice();
+    for (let i=1; i<cells.length; ++i) {
+      const lastValueBinary = possible[cells[i-1]];
+      const lastValues = binaryToArray(lastValueBinary);
+      const minLastValue = Math.min(...lastValues);
+      const currentRestrictionBinary = thermoMinBinaryValues[minLastValue - 1];
+      possible[cells[i]] &= currentRestrictionBinary;
+    }
+    for (let i=cells.length - 2; i>=0; --i) {
+      const lastValueBinary = possible[cells[i+1]];
+      const lastValues = binaryToArray(lastValueBinary);
+      const maxLastValue = Math.max(...lastValues);
+      const currentRestrictionBinary = thermoMaxBinaryValues[maxLastValue - 1];
+      possible[cells[i]] &= currentRestrictionBinary;
+    }
+    return possible;
+  }
+  return restriction;
+}
+

@@ -63,7 +63,7 @@ function getPossibleInternal(restrictions, possible, previousPossible, maxDepth)
       printPossible(possible);
     }
 
-    if (maxDepth === 0) {
+    if (maxDepth === 0 || Math.min(...possible) === 0) {
       return possible;
     }
 

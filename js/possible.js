@@ -27,13 +27,18 @@ export function binaryToArray(binary) {
   return result;
 }
 
-export function printPossible(possible) {
-  console.log("Possible");
+export function getDisplay(possible) {
   const slices = [];
   for (let i = 0; i < 81; i += 9) {
     slices.push(possible.slice(i, i + 9).map(x => binaryToArray(x).join('').padStart(9, ' ')).join(' '));
   }
-  console.log(slices.join('\n'));
+  return slices.join('\n');
+}
+
+export function printPossible(possible) {
+  console.log("Possible");
+  let possibleString = getDisplay(possible);
+  console.log(possibleString);
 }
 
 export function getFixedPoints(currentPossible) {
