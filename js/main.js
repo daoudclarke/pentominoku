@@ -1,4 +1,6 @@
-import {drawSudoku} from "./draw";
+import {Sudoku} from "./draw";
 
 
-drawSudoku();
+
+const sudoku = new Sudoku();
+sudoku.draw();
