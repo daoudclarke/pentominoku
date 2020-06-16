@@ -1,5 +1,4 @@
-import {test, testKingsMove, testKnightsMove, testOrthogonalConsecutive} from "./solver";
+import {drawSudoku} from "./draw";
 
 
-
-test();
+drawSudoku();
