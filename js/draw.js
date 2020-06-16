@@ -4,6 +4,8 @@ import { SVG } from '@svgdotjs/svg.js'
 export function drawSudoku() {
   const draw = SVG().addTo('body').size(1200, 1200);
 
+  let lastRect = null;
+
   for (let i=0; i<9; ++i) {
     for (let j=0; j<9; ++j) {
       let x = 20 + 90*i;
@@ -19,6 +21,13 @@ export function drawSudoku() {
 
       square.mouseover(() => rect.attr({fill: '#eee'}));
       square.mouseout(() => rect.attr({fill: '#fff'}));
+      square.click(() => {
+        if (lastRect !== null) {
+          lastRect.removeClass('selected');
+        }
+        rect.addClass('selected');
+        lastRect = rect;
+      })
 
     }
   }

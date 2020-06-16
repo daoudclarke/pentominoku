@@ -261,3 +261,8 @@ textarea {
   }
 }
 
+
+/*SVG styles*/
+.selected {
+  fill: #b3d4fc;
+}
