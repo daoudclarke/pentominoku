@@ -1,7 +1,7 @@
 import {allPossible, binaryToArray, getFixedPoints, printPossible, singlePossibilities} from "./possible";
 import {boxRestriction, columnRestriction, rowRestriction} from "./restrictions";
 
-export let nearlySolved = new Set();
+let nearlySolved = new Set();
 
 for (let i=0; i<9; ++i) {
   for (let j=0; j<9; ++j) {
