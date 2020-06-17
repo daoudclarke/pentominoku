@@ -274,3 +274,7 @@ text {
 .manual text {
   fill: #000;
 }
+
+.wrong rect {
+  fill: red;
+}

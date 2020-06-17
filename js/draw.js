@@ -51,6 +51,14 @@ export class Sudoku {
     this.selectedSquare.addClass('manual');
   }
 
+  setCellWrong(index) {
+    this.rects[index].square.addClass('wrong');
+  }
+
+  setCellRight(index) {
+    this.rects[index].square.removeClass('wrong');
+  }
+
   setCellValue(index, value) {
     if (index === null || !allowedChars.has(value)) {
       return;
@@ -84,6 +92,11 @@ export class Sudoku {
         const value = possibleDecimal[i][0];
         console.log("Setting value", i, value);
         this.setCellValue(i, value.toString());
+      }
+      if (possibleDecimal[i].length === 0) {
+        this.setCellWrong(i);
+      } else {
+        this.setCellRight(i);
       }
     }
   }
