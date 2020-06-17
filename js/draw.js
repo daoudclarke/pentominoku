@@ -31,10 +31,10 @@ export class Sudoku {
         square.mouseover(() => rect.attr({fill: '#eee'}));
         square.mouseout(() => rect.attr({fill: '#fff'}));
         square.click(() => {
-          if (this.selectedRect !== null) {
-            this.selectedRect.removeClass('selected');
+          if (this.selectedSquare !== null) {
+            this.selectedSquare.removeClass('selected');
           }
-          rect.addClass('selected');
+          square.addClass('selected');
           this.selectedRectIndex = i*9 + j;
         });
         this.rects.push({rect: rect, square: square, text: text});
@@ -45,6 +45,10 @@ export class Sudoku {
   setCurrentCellValue(value) {
     const index = this.selectedRectIndex;
     this.setCellValue(index, value);
+  }
+
+  setCurrentCellManual() {
+    this.selectedSquare.addClass('manual');
   }
 
   setCellValue(index, value) {
@@ -59,9 +63,9 @@ export class Sudoku {
     text.center(45, 45);
   }
 
-  get selectedRect() {
+  get selectedSquare() {
     console.log("Selected rect index", this.selectedRectIndex);
-    return this.selectedRectIndex === null ? null : this.rects[this.selectedRectIndex].rect;
+    return this.selectedRectIndex === null ? null : this.rects[this.selectedRectIndex].square;
   }
 
   updatePossible() {

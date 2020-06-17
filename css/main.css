@@ -263,6 +263,14 @@ textarea {
 
 
 /*SVG styles*/
-.selected {
+.selected rect {
   fill: #b3d4fc;
+}
+
+text {
+  fill: #4868ab;
+}
+
+.manual text {
+  fill: #000;
 }

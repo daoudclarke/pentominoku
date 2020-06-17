@@ -8,7 +8,8 @@ const sudoku = new Sudoku(solver);
 sudoku.draw();
 
 document.onkeypress = function (e) {
-    e = e || window.event;
-    sudoku.setCurrentCellValue(e.key);
-    sudoku.updatePossible();
+  e = e || window.event;
+  sudoku.setCurrentCellValue(e.key);
+  sudoku.setCurrentCellManual();
+  sudoku.updatePossible();
 };
