@@ -1,5 +1,5 @@
 // noinspection ES6CheckImport
-import { SVG } from '@svgdotjs/svg.js'
+import {SVG} from '@svgdotjs/svg.js'
 import {binaryToArray} from "./possible";
 
 const allowedChars = new Set(['1', '2', '3', '4', '5', '6', '7', '8', '9']);
@@ -37,7 +37,7 @@ export class Sudoku {
           square.addClass('selected');
           this.selectedRectIndex = i*9 + j;
         });
-        this.rects.push({rect: rect, square: square, text: text});
+        this.rects.push({rect: rect, square: square, text: text, manual: false});
       }
     }
   }
@@ -47,8 +47,20 @@ export class Sudoku {
     this.setCellValue(index, value);
   }
 
+  removeCurrentCellValue() {
+    const index = this.selectedRectIndex;
+    this.rects[index].value = null;
+    this.rects[index].text.text('');
+  }
+
   setCurrentCellManual() {
+    this.rects[this.selectedRectIndex].manual = true;
     this.selectedSquare.addClass('manual');
+  }
+
+  setCurrentCellAuto() {
+    this.rects[this.selectedRectIndex].manual = false;
+    this.selectedSquare.removeClass('manual');
   }
 
   setCellWrong(index) {
@@ -71,6 +83,23 @@ export class Sudoku {
     text.center(45, 45);
   }
 
+  setCellValues(index, values) {
+    const valueString = values.join('');
+    const text = this.rects[index].text;
+    text.text(valueString);
+
+    if (values.length > 4) {
+      text.text('');
+      return;
+    }
+
+    const fontSize = values.length > 1 ? 30 : 60;
+    text.font({'font-size': fontSize + 'px'});
+    text.center(45, 45);
+    // const scale = 90 / text.bbox().width;
+    // text.width(80);
+  }
+
   get selectedSquare() {
     console.log("Selected rect index", this.selectedRectIndex);
     return this.selectedRectIndex === null ? null : this.rects[this.selectedRectIndex].square;
@@ -88,11 +117,14 @@ export class Sudoku {
     const possibleBinary = this.solver.getPossible(solution);
     const possibleDecimal = possibleBinary.map((x) => binaryToArray(x));
     for (let i=0; i<possibleDecimal.length; ++i) {
-      if (possibleDecimal[i].length === 1) {
-        const value = possibleDecimal[i][0];
-        console.log("Setting value", i, value);
-        this.setCellValue(i, value.toString());
+      if (!this.rects[i].manual) {
+        this.setCellValues(i, possibleDecimal[i]);
       }
+      // if (possibleDecimal[i].length === 1) {
+      //   const value = possibleDecimal[i][0];
+      //   console.log("Setting value", i, value);
+      //   this.setCellValue(i, value.toString());
+      // }
       if (possibleDecimal[i].length === 0) {
         this.setCellWrong(i);
       } else {

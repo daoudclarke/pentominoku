@@ -9,7 +9,13 @@ sudoku.draw();
 
 document.onkeypress = function (e) {
   e = e || window.event;
-  sudoku.setCurrentCellValue(e.key);
-  sudoku.setCurrentCellManual();
+  console.log('Key: ', e.key);
+  if (e.key === 'Delete') {
+    sudoku.removeCurrentCellValue();
+    sudoku.setCurrentCellAuto();
+  } else {
+    sudoku.setCurrentCellValue(e.key);
+    sudoku.setCurrentCellManual();
+  }
   sudoku.updatePossible();
 };
