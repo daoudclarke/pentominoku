@@ -80,6 +80,7 @@ export class Sudoku {
 
     const text = this.rects[index].text;
     text.text(value);
+    text.font({'font-size': "60px"});
     text.center(45, 45);
   }
 
@@ -93,8 +94,8 @@ export class Sudoku {
       return;
     }
 
-    const fontSize = values.length > 1 ? 30 : 60;
-    text.font({'font-size': fontSize + 'px'});
+    const fontSize = values.length > 1 ? '30px' : '60px';
+    text.font({'font-size': fontSize});
     text.center(45, 45);
     // const scale = 90 / text.bbox().width;
     // text.width(80);
