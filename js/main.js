@@ -1,9 +1,15 @@
 import {Sudoku} from "./draw";
 import {Solver} from "./solver";
-import {boxRestriction, columnRestriction, rowRestriction} from "./restrictions";
+import {
+  boxRestriction,
+  columnRestriction,
+  kingsMoveRestriction,
+  knightsMoveRestriction,
+  rowRestriction
+} from "./restrictions";
 
 
-const solver = new Solver([rowRestriction, columnRestriction, boxRestriction])
+const solver = new Solver([rowRestriction, columnRestriction, boxRestriction, kingsMoveRestriction, knightsMoveRestriction])
 const sudoku = new Sudoku(solver);
 sudoku.draw();
 

@@ -45,10 +45,10 @@ export class Solver {
       possible[i] = 1 << (decimal - 1);
     }
 
-    return this.getPossibleInternal(possible, possible.slice(), this.maxDepth);
+    return this.getPossibleInternal(possible, this.maxDepth);
   }
 
-  getPossibleInternal(possible, previousPossible, maxDepth) {
+  getPossibleInternal(possible, maxDepth) {
     while (true) {
       while (true) {
         const oldPossible = possible.slice();
@@ -67,7 +67,7 @@ export class Solver {
         return possible;
       }
 
-      const restriction = this.searchRestriction(possible, previousPossible, maxDepth);
+      const restriction = this.searchRestriction(possible, maxDepth);
       if (restriction == null) {
         break;
       }
@@ -88,14 +88,14 @@ export class Solver {
     return possible;
   }
 
-  searchRestriction(possible, previousPossible, maxDepth) {
+  searchRestriction(possible, maxDepth) {
     console.log("Search restriction", maxDepth);
     for (let i = 0; i < possible.length; ++i) {
       let decimals = binaryToArray(possible[i]);
       for (const decimal of decimals) {
         const possibleCopy = possible.slice();
         possibleCopy[i] = 1 << (decimal - 1);
-        const newPossible = this.getPossibleInternal(possibleCopy, previousPossible, maxDepth - 1);
+        const newPossible = this.getPossibleInternal(possibleCopy, maxDepth - 1);
         const minimumValue = Math.min(...newPossible);
         if (minimumValue === 0) {
           return [i, decimal];
