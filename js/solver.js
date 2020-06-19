@@ -90,15 +90,16 @@ export class Solver {
 
   searchRestriction(possible, maxDepth) {
     console.log("Search restriction", maxDepth);
-    for (let i = 0; i < possible.length; ++i) {
-      let decimals = binaryToArray(possible[i]);
-      for (const decimal of decimals) {
+    const allDecimals = possible.map((x, i) => ({index: i, decimals: binaryToArray(x)}));
+    allDecimals.sort((a, b) => a.decimals.length - b.decimals.length);
+    for (const item of allDecimals) {
+      for (const decimal of item.decimals) {
         const possibleCopy = possible.slice();
-        possibleCopy[i] = 1 << (decimal - 1);
+        possibleCopy[item.index] = 1 << (decimal - 1);
         const newPossible = this.getPossibleInternal(possibleCopy, maxDepth - 1);
         const minimumValue = Math.min(...newPossible);
         if (minimumValue === 0) {
-          return [i, decimal];
+          return [item.index, decimal];
         }
       }
     }
