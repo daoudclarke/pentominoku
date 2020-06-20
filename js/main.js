@@ -4,12 +4,13 @@ import {
   boxRestriction,
   columnRestriction,
   kingsMoveRestriction,
-  knightsMoveRestriction,
+  knightsMoveRestriction, orthogonalConsecutiveRestriction,
   rowRestriction
 } from "./restrictions";
 
 
-const solver = new Solver([rowRestriction, columnRestriction, boxRestriction, kingsMoveRestriction, knightsMoveRestriction])
+const solver = new Solver([rowRestriction, columnRestriction, boxRestriction,
+  kingsMoveRestriction, knightsMoveRestriction])
 const sudoku = new Sudoku(solver);
 sudoku.draw();
 

@@ -12,6 +12,13 @@ function arraysEqual(a, b) {
   return true;
 }
 
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
 export class Solver {
   constructor(restrictions, maxDepth = 1) {
     this.restrictions = restrictions;
@@ -91,8 +98,19 @@ export class Solver {
   searchRestriction(possible, maxDepth) {
     console.log("Search restriction", maxDepth);
     const allDecimals = possible.map((x, i) => ({index: i, decimals: binaryToArray(x)}));
-    allDecimals.sort((a, b) => a.decimals.length - b.decimals.length);
-    for (const item of allDecimals) {
+
+    let searchDecimals = allDecimals.filter(x => x.decimals.length > 1);
+    shuffleArray(searchDecimals);
+    // searchDecimals.sort((a, b) => a.decimals.length - b.decimals.length);
+    // searchDecimals = searchDecimals.slice(0, );
+
+    // const decimalArray = [].concat(...allDecimals.map(x => x.decimals));
+    // const decimalCounts = {};
+    // decimalArray.forEach((x) => decimalCounts[x] = (decimalCounts[x] || 0) + 1);
+    // console.log("Decimal counts", decimalCounts);
+
+    console.log("Sorted decimals", searchDecimals);
+    for (const item of searchDecimals) {
       for (const decimal of item.decimals) {
         const possibleCopy = possible.slice();
         possibleCopy[item.index] = 1 << (decimal - 1);
@@ -103,6 +121,8 @@ export class Solver {
         }
       }
     }
+
+
     return null;
   }
 
