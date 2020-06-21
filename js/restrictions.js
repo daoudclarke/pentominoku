@@ -209,25 +209,28 @@ function getThermoMaxBinaryValues() {
 
 const thermoMaxBinaryValues = getThermoMaxBinaryValues();
 
-export function getThermoRestriction(cells) {
-  function restriction(currentPossible) {
+export class ThermoRestriction {
+  constructor(cells) {
+    this.cells = cells;
+  }
+
+  restrict(currentPossible) {
     const possible = currentPossible.slice();
-    for (let i=1; i<cells.length; ++i) {
-      const lastValueBinary = possible[cells[i-1]];
+    for (let i=1; i<this.cells.length; ++i) {
+      const lastValueBinary = possible[this.cells[i-1]];
       const lastValues = binaryToArray(lastValueBinary);
       const minLastValue = Math.min(...lastValues);
       const currentRestrictionBinary = thermoMinBinaryValues[minLastValue - 1];
-      possible[cells[i]] &= currentRestrictionBinary;
+      possible[this.cells[i]] &= currentRestrictionBinary;
     }
-    for (let i=cells.length - 2; i>=0; --i) {
-      const lastValueBinary = possible[cells[i+1]];
+    for (let i=this.cells.length - 2; i>=0; --i) {
+      const lastValueBinary = possible[this.cells[i+1]];
       const lastValues = binaryToArray(lastValueBinary);
       const maxLastValue = Math.max(...lastValues);
       const currentRestrictionBinary = thermoMaxBinaryValues[maxLastValue - 1];
-      possible[cells[i]] &= currentRestrictionBinary;
+      possible[this.cells[i]] &= currentRestrictionBinary;
     }
     return possible;
   }
-  return restriction;
 }
 

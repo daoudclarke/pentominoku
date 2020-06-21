@@ -6,8 +6,9 @@ const allowedChars = new Set(['1', '2', '3', '4', '5', '6', '7', '8', '9']);
 
 
 export class Sudoku {
-  constructor(solver) {
+  constructor(solver, clickCallback) {
     this.solver = solver;
+    this.clickCallback = clickCallback;
     this.selectedRectIndex = null;
     this.rects = null;
     this.svg = null;
@@ -35,16 +36,19 @@ export class Sudoku {
 
         square.mouseover(() => rect.attr({fill: '#eee'}));
         square.mouseout(() => rect.attr({fill: '#fff'}));
-        square.click(() => {
-          if (this.selectedSquare !== null) {
-            this.selectedSquare.removeClass('selected');
-          }
-          square.addClass('selected');
-          this.selectedRectIndex = i*9 + j;
-        });
+        square.click(() => this.clickCallback(i * 9 + j));
         this.rects.push({rect: rect, square: square, text: text, manual: false});
       }
     }
+  }
+
+  select(index) {
+    const square = this.rects[index].square;
+    if (this.selectedSquare !== null) {
+      this.selectedSquare.removeClass('selected');
+    }
+    square.addClass('selected');
+    this.selectedRectIndex = index;
   }
 
   drawRestriction(restriction) {

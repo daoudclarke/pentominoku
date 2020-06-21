@@ -1,9 +1,9 @@
 import {
   boxRestriction,
-  columnRestriction, getThermoRestriction,
+  columnRestriction,
   kingsMoveRestriction,
   knightsMoveRestriction, orthogonalConsecutiveRestriction,
-  rowRestriction
+  rowRestriction, ThermoRestriction
 } from "./restrictions";
 import {allNumbers, binaryToArray, getDisplay} from "./possible";
 import {expect} from "@jest/globals";
@@ -194,7 +194,8 @@ test('test orthogonal consecutive restriction', () => {
 })
 
 test('test thermo restriction', () => {
-  let solver = new Solver([getThermoRestriction([10, 11, 12, 13, 14])]);
+  const thermo = new ThermoRestriction([10, 11, 12, 13, 14]);
+  let solver = new Solver([thermo.restrict.bind(thermo)]);
   let fixedPoints = [];
 
   const possible = solver.getPossible(fixedPoints);

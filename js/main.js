@@ -2,7 +2,7 @@ import {Sudoku} from "./draw";
 import {Solver} from "./solver";
 import {
   boxRestriction,
-  columnRestriction,
+  columnRestriction, getThermoRestriction,
   kingsMoveRestriction,
   knightsMoveRestriction, orthogonalConsecutiveRestriction,
   rowRestriction
@@ -12,8 +12,15 @@ import {Thermo} from "./drawRestrictions";
 
 const solver = new Solver([rowRestriction, columnRestriction, boxRestriction,
   kingsMoveRestriction, knightsMoveRestriction])
-const sudoku = new Sudoku(solver);
+const sudoku = new Sudoku(solver, onClick);
 sudoku.draw();
+
+const thermo = getThermoRestriction()
+
+function onClick(i) {
+  // sudoku.select(i);
+
+}
 
 const thermo = new Thermo([1,2,3,4]);
 sudoku.drawRestriction(thermo);
