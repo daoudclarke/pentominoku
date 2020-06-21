@@ -2,28 +2,32 @@ import {Sudoku} from "./draw";
 import {Solver} from "./solver";
 import {
   boxRestriction,
-  columnRestriction, getThermoRestriction,
+  columnRestriction,
   kingsMoveRestriction,
   knightsMoveRestriction, orthogonalConsecutiveRestriction,
-  rowRestriction
+  rowRestriction, ThermoRestriction
 } from "./restrictions";
 import {Thermo} from "./drawRestrictions";
 
 
+
+const thermoCells = [];
+const thermoRestriction = new ThermoRestriction(thermoCells);
+const thermo = new Thermo(thermoCells);
+
 const solver = new Solver([rowRestriction, columnRestriction, boxRestriction,
-  kingsMoveRestriction, knightsMoveRestriction])
+  kingsMoveRestriction, thermoRestriction.restrict.bind(thermoRestriction)])
 const sudoku = new Sudoku(solver, onClick);
 sudoku.draw();
 
-const thermo = getThermoRestriction()
 
 function onClick(i) {
   // sudoku.select(i);
-
+  thermoCells.push(i);
+  sudoku.drawRestriction(thermo);
+  sudoku.updatePossible();
 }
 
-const thermo = new Thermo([1,2,3,4]);
-sudoku.drawRestriction(thermo);
 
 document.onkeypress = function (e) {
   e = e || window.event;
