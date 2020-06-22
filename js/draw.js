@@ -6,8 +6,7 @@ const allowedChars = new Set(['1', '2', '3', '4', '5', '6', '7', '8', '9']);
 
 
 export class Sudoku {
-  constructor(solver, clickCallback) {
-    this.solver = solver;
+  constructor(clickCallback) {
     this.clickCallback = clickCallback;
     this.selectedRectIndex = null;
     this.rects = null;
@@ -119,17 +118,7 @@ export class Sudoku {
     return this.selectedRectIndex === null ? null : this.rects[this.selectedRectIndex].square;
   }
 
-  updatePossible() {
-    const solution = [];
-    for (let i=0; i<this.rects.length; ++i) {
-      let value = this.rects[i].value;
-      if (value) {
-        let valueInt = parseInt(value);
-        solution.push([i, valueInt]);
-      }
-    }
-    const possibleBinary = this.solver.getPossible(solution);
-    const possibleDecimal = possibleBinary.map((x) => binaryToArray(x));
+  updatePossible(possibleDecimal) {
     for (let i=0; i<possibleDecimal.length; ++i) {
       if (!this.rects[i].manual) {
         this.setCellValues(i, possibleDecimal[i]);

@@ -36,6 +36,10 @@ export class Solver {
     console.log("Nearly solved", this.nearlySolved);
   }
 
+  addRestriction(restriction) {
+    this.restrictions.push(restriction);
+  }
+
   applyRestrictions(possible) {
     for (const restriction of this.restrictions) {
       const restrictionPossible = restriction(possible);

@@ -8,25 +8,56 @@ import {
   rowRestriction, ThermoRestriction
 } from "./restrictions";
 import {Thermo} from "./drawRestrictions";
+import {binaryToArray} from "./possible";
 
+class ThermoManager {
+  constructor(solver, sudoku) {
+    this.solver = solver;
+    this.sudoku = sudoku;
+  }
 
+  addCell(i) {
+    this.thermoCells.push(i);
+    this.sudoku.drawRestriction(this.thermo);
+    const possibleBinary = solver.getPossible([]);
+    const possibleDecimal = possibleBinary.map((x) => binaryToArray(x));
+    sudoku.updatePossible(possibleDecimal);
+  }
 
-const thermoCells = [];
-const thermoRestriction = new ThermoRestriction(thermoCells);
-const thermo = new Thermo(thermoCells);
+  addThermo() {
+    this.thermoCells = [];
+    this.thermoRestriction = new ThermoRestriction(this.thermoCells);
+    this.thermo = new Thermo(this.thermoCells);
+    this.solver.addRestriction(this.thermoRestriction.restrict.bind(this.thermoRestriction));
+  }
+}
 
 const solver = new Solver([rowRestriction, columnRestriction, boxRestriction,
-  kingsMoveRestriction, thermoRestriction.restrict.bind(thermoRestriction)])
-const sudoku = new Sudoku(solver, onClick);
+  kingsMoveRestriction])
+const sudoku = new Sudoku(onClick);
 sudoku.draw();
+const thermoManager = new ThermoManager(solver, sudoku);
+thermoManager.addThermo();
 
 
 function onClick(i) {
-  // sudoku.select(i);
-  thermoCells.push(i);
-  sudoku.drawRestriction(thermo);
-  sudoku.updatePossible();
+  thermoManager.addCell(i);
 }
+
+
+// function updatePossible() {
+//   const solution = [];
+//   // for (let i=0; i<this.rects.length; ++i) {
+//   //   let value = this.rects[i].value;
+//   //   if (value) {
+//   //     let valueInt = parseInt(value);
+//   //     solution.push([i, valueInt]);
+//   //   }
+//   // }
+//   const possibleBinary = solver.getPossible(solution);
+//   const possibleDecimal = possibleBinary.map((x) => binaryToArray(x));
+//   sudoku.updatePossible(possibleDecimal);
+// }
 
 
 document.onkeypress = function (e) {
@@ -35,9 +66,11 @@ document.onkeypress = function (e) {
   if (e.key === 'Delete') {
     sudoku.removeCurrentCellValue();
     sudoku.setCurrentCellAuto();
+  } else if (e.key === 'n') {
+    thermoManager.addThermo();
   } else {
     sudoku.setCurrentCellValue(e.key);
     sudoku.setCurrentCellManual();
   }
-  sudoku.updatePossible();
+  // sudoku.updatePossible();
 };
