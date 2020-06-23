@@ -4,8 +4,8 @@ import {
   boxRestriction,
   columnRestriction,
   kingsMoveRestriction,
-  knightsMoveRestriction, orthogonalConsecutiveRestriction,
-  rowRestriction, ThermoRestriction
+  rowRestriction,
+  ThermoRestriction
 } from "./restrictions";
 import {Thermo} from "./drawRestrictions";
 import {binaryToArray} from "./possible";
@@ -14,30 +14,61 @@ class ThermoManager {
   constructor(solver, sudoku) {
     this.solver = solver;
     this.sudoku = sudoku;
+    this.restrictionCells = [];
   }
 
   addCell(i) {
-    this.thermoCells.push(i);
-    this.sudoku.drawRestriction(this.thermo);
-    const possibleBinary = solver.getPossible([]);
+    if (this.restrictionCells.length === 0) {
+      this.addThermo();
+    }
+    this.restrictionCells[this.restrictionCells.length - 1].push(i);
+    const thermoRestrictions = this.getRestrictions();
+    const restrictions = [rowRestriction, columnRestriction, boxRestriction,
+      kingsMoveRestriction].concat(thermoRestrictions);
+    const possibleBinary = solver.getPossible([], restrictions);
     const possibleDecimal = possibleBinary.map((x) => binaryToArray(x));
     sudoku.updatePossible(possibleDecimal);
+    this.draw();
+  }
+
+  removeThermo() {
+    while (this.restrictionCells[this.restrictionCells.length - 1].length === 0) {
+      this.restrictionCells.pop();
+    }
+    this.restrictionCells.pop();
+    this.addThermo();
+    this.draw();
   }
 
   addThermo() {
-    this.thermoCells = [];
-    this.thermoRestriction = new ThermoRestriction(this.thermoCells);
-    this.thermo = new Thermo(this.thermoCells);
-    this.solver.addRestriction(this.thermoRestriction.restrict.bind(this.thermoRestriction));
+    this.restrictionCells.push([]);
+  }
+
+  getRestrictions() {
+    const restrictions = [];
+    for (const cells of this.restrictionCells) {
+      const thermoRestriction = new ThermoRestriction(cells);
+      restrictions.push(thermoRestriction.restrict.bind(thermoRestriction));
+    }
+    return restrictions;
+  }
+
+  draw() {
+    console.log("Drawing", this.restrictionCells);
+    this.sudoku.draw();
+    for (const cells of this.restrictionCells) {
+      if (cells.length > 0) {
+        this.sudoku.drawRestriction(new Thermo(cells));
+      }
+    }
   }
 }
 
-const solver = new Solver([rowRestriction, columnRestriction, boxRestriction,
-  kingsMoveRestriction])
+const solver = new Solver()
 const sudoku = new Sudoku(onClick);
 sudoku.draw();
 const thermoManager = new ThermoManager(solver, sudoku);
-thermoManager.addThermo();
+// thermoManager.addThermo();
 
 
 function onClick(i) {
@@ -68,6 +99,8 @@ document.onkeypress = function (e) {
     sudoku.setCurrentCellAuto();
   } else if (e.key === 'n') {
     thermoManager.addThermo();
+  } else if (e.key === 'd') {
+    thermoManager.removeThermo();
   } else {
     sudoku.setCurrentCellValue(e.key);
     sudoku.setCurrentCellManual();

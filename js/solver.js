@@ -20,8 +20,7 @@ function shuffleArray(array) {
 }
 
 export class Solver {
-  constructor(restrictions, maxDepth = 1) {
-    this.restrictions = restrictions;
+  constructor(maxDepth = 1) {
     this.maxDepth = maxDepth;
 
     this.nearlySolved = new Set();
@@ -36,12 +35,8 @@ export class Solver {
     console.log("Nearly solved", this.nearlySolved);
   }
 
-  addRestriction(restriction) {
-    this.restrictions.push(restriction);
-  }
-
-  applyRestrictions(possible) {
-    for (const restriction of this.restrictions) {
+  applyRestrictions(restrictions, possible) {
+    for (const restriction of restrictions) {
       const restrictionPossible = restriction(possible);
       for (let i = 0; i < possible.length; ++i) {
         possible[i] &= restrictionPossible[i];
@@ -49,21 +44,21 @@ export class Solver {
     }
   }
 
-  getPossible(solution) {
+  getPossible(solution, restrictions) {
     const possible = allPossible.slice();
 
     for (const [i, decimal] of solution) {
       possible[i] = 1 << (decimal - 1);
     }
 
-    return this.getPossibleInternal(possible, this.maxDepth);
+    return this.getPossibleInternal(restrictions, possible, this.maxDepth);
   }
 
-  getPossibleInternal(possible, maxDepth) {
+  getPossibleInternal(restrictions, possible, maxDepth) {
     while (true) {
       while (true) {
         const oldPossible = possible.slice();
-        this.applyRestrictions(possible);
+        this.applyRestrictions(restrictions, possible);
         if (arraysEqual(oldPossible, possible)) {
           break;
         }
@@ -78,7 +73,7 @@ export class Solver {
         return possible;
       }
 
-      const restriction = this.searchRestriction(possible, maxDepth);
+      const restriction = this.searchRestriction(restrictions, possible, maxDepth);
       if (restriction == null) {
         break;
       }
@@ -99,7 +94,7 @@ export class Solver {
     return possible;
   }
 
-  searchRestriction(possible, maxDepth) {
+  searchRestriction(restrictions, possible, maxDepth) {
     console.log("Search restriction", maxDepth);
     const allDecimals = possible.map((x, i) => ({index: i, decimals: binaryToArray(x)}));
 
@@ -118,7 +113,7 @@ export class Solver {
       for (const decimal of item.decimals) {
         const possibleCopy = possible.slice();
         possibleCopy[item.index] = 1 << (decimal - 1);
-        const newPossible = this.getPossibleInternal(possibleCopy, maxDepth - 1);
+        const newPossible = this.getPossibleInternal(restrictions, possibleCopy, maxDepth - 1);
         const minimumValue = Math.min(...newPossible);
         if (minimumValue === 0) {
           return [item.index, decimal];

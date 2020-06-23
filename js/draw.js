@@ -15,6 +15,9 @@ export class Sudoku {
   }
 
   draw() {
+    if (this.svg) {
+      this.svg.remove();
+    }
     this.svg = SVG().addTo('body').size(1200, 1200);
 
     this.locations = [];
