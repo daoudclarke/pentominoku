@@ -278,3 +278,11 @@ text {
 .wrong rect {
   fill: red;
 }
+
+.square :hover {
+  fill: #fff;
+}
+
+.square :hover {
+  fill: #eee;
+}

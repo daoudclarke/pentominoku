@@ -12,6 +12,7 @@ export class Sudoku {
     this.rects = null;
     this.svg = null;
     this.locations = null;
+    this.hoveredSquare = null;
   }
 
   draw() {
@@ -31,14 +32,17 @@ export class Sudoku {
 
         const square = this.svg.nested();
         square.attr({x: x, y: y});
+        square.addClass('square');
 
         const rect = square.rect(90, 90).attr({x: 0, y: 0, fill: '#fff', stroke: '#000', 'stroke-width': 1});
         const text = square.text('').attr(
           {'font-size': '60px'});
 
-        square.mouseover(() => rect.attr({fill: '#eee'}));
-        square.mouseout(() => rect.attr({fill: '#fff'}));
-        square.click(() => this.clickCallback(i * 9 + j));
+        // square.mouseover(() => rect.attr({fill: '#eee'}));
+        // square.mouseout(() => rect.attr({fill: '#fff'}));
+        let index = i * 9 + j;
+        square.mouseover(() => this.hoveredSquare = index);
+        square.click(() => this.clickCallback(index));
         this.rects.push({rect: rect, square: square, text: text, manual: false});
       }
     }

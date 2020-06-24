@@ -22,22 +22,43 @@ class ThermoManager {
       this.addThermo();
     }
     this.restrictionCells[this.restrictionCells.length - 1].push(i);
+
+    this.draw();
+    this.update();
+  }
+
+  update() {
     const thermoRestrictions = this.getRestrictions();
     const restrictions = [rowRestriction, columnRestriction, boxRestriction,
       kingsMoveRestriction].concat(thermoRestrictions);
     const possibleBinary = solver.getPossible([], restrictions);
     const possibleDecimal = possibleBinary.map((x) => binaryToArray(x));
     sudoku.updatePossible(possibleDecimal);
-    this.draw();
   }
 
   removeThermo() {
-    while (this.restrictionCells[this.restrictionCells.length - 1].length === 0) {
-      this.restrictionCells.pop();
+    // while (this.restrictionCells[this.restrictionCells.length - 1].length === 0) {
+    //   this.restrictionCells.pop();
+    // }
+    // this.restrictionCells.pop();
+    // this.addThermo();
+    if (this.removeHovered()) {
+      this.draw();
+      this.update();
     }
-    this.restrictionCells.pop();
-    this.addThermo();
-    this.draw();
+  }
+
+  removeHovered() {
+    const hovered = this.sudoku.hoveredSquare;
+    for (const cells of this.restrictionCells) {
+      for (let i=0; i<cells.length; ++i) {
+        if (cells[i] === hovered) {
+          while (cells.pop() !== hovered) {}
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   addThermo() {
