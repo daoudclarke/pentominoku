@@ -108,7 +108,7 @@ export class Solver {
     // decimalArray.forEach((x) => decimalCounts[x] = (decimalCounts[x] || 0) + 1);
     // console.log("Decimal counts", decimalCounts);
 
-    console.log("Sorted decimals", searchDecimals);
+    // console.log("Sorted decimals", searchDecimals);
     for (const item of searchDecimals) {
       for (const decimal of item.decimals) {
         const possibleCopy = possible.slice();

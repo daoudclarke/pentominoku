@@ -234,3 +234,41 @@ export class ThermoRestriction {
   }
 }
 
+export class PrimeNumberRestriction {
+  constructor(pairs) {
+    this.pairs = pairs;
+
+    const primeNumbers = new Set([2, 3, 5, 7, 11, 13, 17]);
+    this.allowedValues = [];
+    for (let i=1; i<=9; ++i) {
+      let allowedValues = 0;
+      for (let j=1; j<=9; ++j) {
+        if (primeNumbers.has(i + j)) {
+          allowedValues |= 1 << (j - 1);
+        }
+      }
+      this.allowedValues.push(allowedValues);
+    }
+    console.log("Prime pairs", this.allowedValues);
+  }
+
+  restrict(currentPossible) {
+    const possible = currentPossible.slice();
+
+    for (const [first, second] of this.pairs) {
+      this.restrictPrimes(first, second, possible);
+      this.restrictPrimes(second, first, possible);
+    }
+
+    return possible;
+  }
+
+  restrictPrimes(first, second, possible) {
+    const firstPossible = binaryToArray(possible[first]);
+    let secondAllowed = 0;
+    for (const firstValue of firstPossible) {
+      secondAllowed |= this.allowedValues[firstValue - 1];
+    }
+    possible[second] &= secondAllowed;
+  }
+}

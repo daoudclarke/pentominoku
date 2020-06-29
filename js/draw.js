@@ -62,19 +62,21 @@ export class Sudoku {
   }
 
   setCurrentCellValue(value) {
-    const index = this.selectedRectIndex;
+    const index = this.hoveredSquare;
     this.setCellValue(index, value);
   }
 
   removeCurrentCellValue() {
-    const index = this.selectedRectIndex;
+    const index = this.hoveredSquare;
     this.rects[index].value = null;
     this.rects[index].text.text('');
   }
 
   setCurrentCellManual() {
-    this.rects[this.selectedRectIndex].manual = true;
-    this.selectedSquare.addClass('manual');
+    if (this.hoveredSquare !== null) {
+      this.rects[this.hoveredSquare].manual = true;
+      this.rects[this.hoveredSquare].square.addClass('manual');
+    }
   }
 
   setCurrentCellAuto() {
@@ -104,14 +106,19 @@ export class Sudoku {
   }
 
   setCellValues(index, values) {
-    const valueString = values.join('');
+    let valueString = values.join('');
     const text = this.rects[index].text;
-    text.text(valueString);
 
-    if (values.length > 4) {
+    if (values.length === 9) {
       text.text('');
       return;
     }
+
+    if (values.length > 4) {
+      valueString = valueString.substring(0, 4).concat('\n').concat(valueString.substring(4))
+    }
+
+    text.text(valueString);
 
     const fontSize = values.length > 1 ? '30px' : '60px';
     text.font({'font-size': fontSize});

@@ -2,7 +2,7 @@ import {
   boxRestriction,
   columnRestriction,
   kingsMoveRestriction,
-  knightsMoveRestriction, orthogonalConsecutiveRestriction,
+  knightsMoveRestriction, orthogonalConsecutiveRestriction, PrimeNumberRestriction,
   rowRestriction, ThermoRestriction
 } from "./restrictions";
 import {allNumbers, binaryToArray, getDisplay} from "./possible";
@@ -222,6 +222,29 @@ test('test thermo restriction', () => {
 
   expect(display).toEqual(expected);
 })
+
+test('test prime number restriction', () => {
+  const prime = new PrimeNumberRestriction([[10, 11], [11, 12], [12, 13]]);
+  let solver = new Solver();
+  const restrictions = [prime.restrict.bind(prime)];
+  let fixedPoints = [[10, 2]];
+
+  const possible = solver.getPossible(fixedPoints, restrictions);
+  const display = getDisplay(possible);
+
+  const expected = `123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789         2      1359     12468  12345679 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789`;
+
+  expect(display).toEqual(expected);
+})
+
 
 test('test miracle sudoku', () => {
   const solver = new Solver();

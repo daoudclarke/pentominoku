@@ -3,12 +3,14 @@ import {Solver} from "./solver";
 import {
   boxRestriction,
   columnRestriction,
-  kingsMoveRestriction,
+  kingsMoveRestriction, PrimeNumberRestriction,
   rowRestriction,
   ThermoRestriction
 } from "./restrictions";
 import {Thermo} from "./drawRestrictions";
 import {binaryToArray} from "./possible";
+
+const fixedPoints = [];
 
 class ThermoManager {
   constructor(solver, sudoku) {
@@ -29,19 +31,13 @@ class ThermoManager {
 
   update() {
     const thermoRestrictions = this.getRestrictions();
-    const restrictions = [rowRestriction, columnRestriction, boxRestriction,
-      kingsMoveRestriction].concat(thermoRestrictions);
-    const possibleBinary = solver.getPossible([], restrictions);
+    const restrictions = [rowRestriction, columnRestriction, boxRestriction].concat(thermoRestrictions);
+    const possibleBinary = solver.getPossible(fixedPoints, restrictions);
     const possibleDecimal = possibleBinary.map((x) => binaryToArray(x));
     sudoku.updatePossible(possibleDecimal);
   }
 
   removeThermo() {
-    // while (this.restrictionCells[this.restrictionCells.length - 1].length === 0) {
-    //   this.restrictionCells.pop();
-    // }
-    // this.restrictionCells.pop();
-    // this.addThermo();
     if (this.removeHovered()) {
       this.draw();
       this.update();
@@ -65,13 +61,25 @@ class ThermoManager {
     this.restrictionCells.push([]);
   }
 
+  // getRestrictions() {
+  //   const restrictions = [];
+  //   for (const cells of this.restrictionCells) {
+  //     const thermoRestriction = new ThermoRestriction(cells);
+  //     restrictions.push(thermoRestriction.restrict.bind(thermoRestriction));
+  //   }
+  //   return restrictions;
+  // }
+
   getRestrictions() {
-    const restrictions = [];
+    const pairs = [];
     for (const cells of this.restrictionCells) {
-      const thermoRestriction = new ThermoRestriction(cells);
-      restrictions.push(thermoRestriction.restrict.bind(thermoRestriction));
+      for (let i=1; i<cells.length; ++i) {
+        const pair = [cells[i-1], cells[i]];
+        pairs.push(pair);
+      }
     }
-    return restrictions;
+    const restriction = new PrimeNumberRestriction(pairs);
+    return [restriction.restrict.bind(restriction)];
   }
 
   draw() {
@@ -85,7 +93,7 @@ class ThermoManager {
   }
 }
 
-const solver = new Solver()
+const solver = new Solver();
 const sudoku = new Sudoku(onClick);
 sudoku.draw();
 const thermoManager = new ThermoManager(solver, sudoku);
@@ -125,6 +133,8 @@ document.onkeypress = function (e) {
   } else {
     sudoku.setCurrentCellValue(e.key);
     sudoku.setCurrentCellManual();
+    fixedPoints.push([sudoku.hoveredSquare, sudoku.rects[sudoku.hoveredSquare].value]);
+    thermoManager.update();
   }
   // sudoku.updatePossible();
 };
