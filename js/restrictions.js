@@ -1,17 +1,44 @@
 import {allNumbers, allPossible, binaryToArray, getFixedPoints} from "./possible";
 
 
-function atMostRestriction(neighbours) {
+export function atMostRestriction(neighbours) {
   function restriction(currentPossible) {
-    const fixedPoints = getFixedPoints(currentPossible);
     const possible = currentPossible.slice();
-    for (const [i, value] of fixedPoints) {
-      let valueBinary = 1 << (value - 1);
-      const notValue = allNumbers - valueBinary;
-      for (const neighbour of neighbours[i]) {
-        possible[neighbour] &= notValue;
+    for (let i=0; i<possible.length; ++i) {
+      const value = possible[i];
+      const requiredCount = binaryToArray(value).length;
+      // console.log("RequiredCount", requiredCount, "value", value);
+
+      if (requiredCount > 4) {
+        continue;
+      }
+
+      const keep = [];
+      if (requiredCount > 1) {
+        for (const neighbour of neighbours[i]) {
+          const neighbourValue = possible[neighbour];
+          // console.log("Neighbour value", neighbourValue);
+          if ((neighbourValue | value) === value) {
+            keep.push(neighbour);
+            if (keep.length === requiredCount - 1) {
+              break;
+            }
+          }
+        }
+      }
+
+      if (keep.length === requiredCount - 1) {
+        const keepSet = new Set(keep);
+        for (const neighbour of neighbours[i]) {
+          if (keepSet.has(neighbour)) {
+            continue;
+          }
+
+          possible[neighbour] &= ~value;
+        }
       }
     }
+
     return possible;
   }
 
@@ -116,7 +143,7 @@ function boxNeighbours() {
   return neighbours;
 }
 
-const boxNeighbourValues = boxNeighbours();
+export const boxNeighbourValues = boxNeighbours();
 export const boxRestriction = combinedRestriction(
   [atLeastRestriction(boxNeighbourValues), atMostRestriction(boxNeighbourValues)]
 )
