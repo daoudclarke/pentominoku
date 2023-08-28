@@ -10,11 +10,11 @@ import {
 
 
 const solver = new Solver([rowRestriction, columnRestriction, boxRestriction,
-  kingsMoveRestriction, knightsMoveRestriction])
+  orthogonalConsecutiveRestriction, knightsMoveRestriction])
 const sudoku = new Sudoku(solver);
 sudoku.draw();
 
-document.onkeypress = function (e) {
+document.onkeydown = function (e) {
   e = e || window.event;
   console.log('Key: ', e.key);
   if (e.key === 'Delete') {
