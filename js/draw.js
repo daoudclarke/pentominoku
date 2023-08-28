@@ -2,7 +2,7 @@
 import {SVG} from '@svgdotjs/svg.js'
 import {binaryToArray} from "./possible";
 
-const allowedChars = new Set(['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+export const allowedChars = new Set(['1', '2', '3', '4', '5', '6', '7', '8', '9']);
 
 
 export class Sudoku {
@@ -80,8 +80,9 @@ export class Sudoku {
   }
 
   setCurrentCellAuto() {
-    this.rects[this.selectedRectIndex].manual = false;
-    this.selectedSquare.removeClass('manual');
+    console.log("Selected rect", this.hoveredSquare)
+    this.rects[this.hoveredSquare].manual = false;
+    this.rects[this.hoveredSquare].square.removeClass('manual');
   }
 
   setCellWrong(index) {

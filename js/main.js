@@ -1,4 +1,4 @@
-import {Sudoku} from "./draw";
+import {allowedChars, Sudoku} from "./draw";
 import {Solver} from "./solver";
 import {
   boxRestriction,
@@ -10,7 +10,7 @@ import {
 import {Thermo} from "./drawRestrictions";
 import {binaryToArray} from "./possible";
 
-const fixedPoints = [];
+const fixedPoints = new Map();
 
 class ThermoManager {
   constructor(solver, sudoku) {
@@ -120,20 +120,22 @@ function onClick(i) {
 // }
 
 
-document.onkeypress = function (e) {
+document.onkeydown = function (e) {
   e = e || window.event;
   console.log('Key: ', e.key);
   if (e.key === 'Delete') {
     sudoku.removeCurrentCellValue();
     sudoku.setCurrentCellAuto();
+    fixedPoints.delete(sudoku.hoveredSquare);
+    thermoManager.update();
   } else if (e.key === 'n') {
     thermoManager.addThermo();
   } else if (e.key === 'd') {
     thermoManager.removeThermo();
-  } else {
+  } else if (allowedChars.has(e.key)) {
     sudoku.setCurrentCellValue(e.key);
     sudoku.setCurrentCellManual();
-    fixedPoints.push([sudoku.hoveredSquare, sudoku.rects[sudoku.hoveredSquare].value]);
+    fixedPoints.set(sudoku.hoveredSquare, sudoku.rects[sudoku.hoveredSquare].value);
     thermoManager.update();
   }
   // sudoku.updatePossible();
