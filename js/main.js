@@ -9,6 +9,7 @@ import {
 } from "./restrictions";
 import {Thermo} from "./drawRestrictions";
 import {binaryToArray} from "./possible";
+import {Pentomino, PentominoManager} from "./pentomino";
 
 const fixedPoints = new Map();
 
@@ -95,9 +96,24 @@ class ThermoManager {
 
 const solver = new Solver();
 const sudoku = new Sudoku(onClick);
-sudoku.draw();
-const thermoManager = new ThermoManager(solver, sudoku);
+// sudoku.draw();
+// const thermoManager = new ThermoManager(solver, sudoku);
 // thermoManager.addThermo();
+
+const pentominos = [
+  new Pentomino("F", 0, 0),
+  new Pentomino("L", 3, 0),
+  new Pentomino("N", 5, 0),
+  new Pentomino("P", 7, 0),
+  new Pentomino("T", 0, 3),
+  new Pentomino("U", 6, 3),
+  new Pentomino("V", 4, 4),
+  new Pentomino("W", 0, 6),
+  new Pentomino("X", 2, 6),
+  new Pentomino("Y", 7, 5),
+]
+const pentominoManager = new PentominoManager(sudoku, pentominos);
+pentominoManager.draw()
 
 
 function onClick(i) {
