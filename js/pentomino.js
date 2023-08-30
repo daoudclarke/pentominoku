@@ -26,21 +26,46 @@ pentominoColours.set("X", "#79c27e");
 pentominoColours.set("Y", "#afa400");
 
 export class Pentomino {
-  constructor(type = "F", x = 0, y = 0) {
+  constructor(type = "F", x = 0, y = 0, variation = 0) {
     if (!pentominoOffsets.has(type)) {
       throw Error("Invalid type: " + type);
     }
 
     this.type = type;
 
-    const offsets = pentominoOffsets.get(type);
+    const originalOffsets = pentominoOffsets.get(type);
+    const offsets = [];
+    const maxX = Math.max(...originalOffsets.map(x => x[0]));
+    const maxY = Math.max(...originalOffsets.map(x => x[1]));
+
+    // Rotate and flip the original
+    for (const [ox, oy] of originalOffsets) {
+      let newX = ox;
+      let newY = oy;
+      if (variation % 2 === 1) {
+        newY = maxY - newY;
+      }
+      if (variation % 4 >= 2) {
+        newX = maxX - newX;
+      }
+
+      if (variation >= 4) {
+        const s = newX;
+        newX = newY;
+        newY = s;
+      }
+      offsets.push([newX, newY]);
+    }
+
+
+
     this.indexes = [];
     for (const [ox, oy] of offsets) {
       const new_x = x + ox;
       const new_y = y + oy;
 
-      if (new_x >= 9 || new_y >= 9) {
-        throw Error("Position no good");
+      if (new_x >= 9 || new_y >= 9 || new_x < 0 || new_y < 0) {
+        throw Error("Position no good:" + new_x + " " + new_y);
       }
 
       this.indexes.push(new_y + new_x*9);
@@ -75,3 +100,4 @@ export class PentominoManager {
     }
   }
 }
+

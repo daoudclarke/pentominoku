@@ -100,18 +100,30 @@ const sudoku = new Sudoku(onClick);
 // const thermoManager = new ThermoManager(solver, sudoku);
 // thermoManager.addThermo();
 
+// const pentominos = [
+//   new Pentomino("F", 0, 0),
+//   new Pentomino("L", 3, 0),
+//   new Pentomino("N", 5, 0),
+//   new Pentomino("P", 7, 0),
+//   new Pentomino("T", 0, 3),
+//   new Pentomino("U", 6, 3),
+//   new Pentomino("V", 4, 4),
+//   new Pentomino("W", 0, 6),
+//   new Pentomino("X", 2, 6),
+//   new Pentomino("Y", 7, 5),
+// ]
+
 const pentominos = [
-  new Pentomino("F", 0, 0),
-  new Pentomino("L", 3, 0),
-  new Pentomino("N", 5, 0),
-  new Pentomino("P", 7, 0),
-  new Pentomino("T", 0, 3),
-  new Pentomino("U", 6, 3),
-  new Pentomino("V", 4, 4),
-  new Pentomino("W", 0, 6),
-  new Pentomino("X", 2, 6),
-  new Pentomino("Y", 7, 5),
+  new Pentomino("F", 0, 0, 0),
+  new Pentomino("F", 3, 0, 1),
+  new Pentomino("F", 6, 0, 2),
+  new Pentomino("F", 0, 3, 3),
+  new Pentomino("F", 3, 3, 4),
+  new Pentomino("F", 6, 3, 5),
+  new Pentomino("F", 0, 6, 6),
+  new Pentomino("F", 3, 6, 7),
 ]
+
 const pentominoManager = new PentominoManager(sudoku, pentominos);
 pentominoManager.draw()
 
