@@ -1,3 +1,4 @@
+import {off} from "@svgdotjs/svg.js";
 
 
 const pentominoOffsets = new Map();
@@ -57,8 +58,6 @@ export class Pentomino {
       offsets.push([newX, newY]);
     }
 
-
-
     this.indexes = [];
     for (const [ox, oy] of offsets) {
       const new_x = x + ox;
@@ -70,6 +69,7 @@ export class Pentomino {
 
       this.indexes.push(new_y + new_x*9);
     }
+    this.indexes.sort();
     console.log("Indexes", this.indexes);
   }
 
@@ -84,7 +84,35 @@ export class Pentomino {
       const rect = square.rect(90, 90).attr({x: 0, y: 0, fill: colour, stroke: null, 'stroke-width': 0});
     }
   }
+
+  toString() {
+    return this.indexes.toString();
+  }
 }
+
+
+function getVariations() {
+  const pentominoVariations = new Map();
+  for (const type of pentominoOffsets.keys()) {
+    const seen = new Set();
+    const variations = [];
+    for (let variation=0; variation<8; ++variation) {
+      const pentomino = new Pentomino(type, 0, 0, variation);
+      const pentominoStr = pentomino.toString();
+      if (seen.has(pentominoStr)) {
+        continue;
+      }
+      seen.add(pentominoStr);
+      variations.push(variation);
+    }
+    pentominoVariations.set(type, variations);
+  }
+  console.log("Variations", pentominoVariations);
+  return pentominoVariations;
+}
+
+
+const pentominoVariations = getVariations();
 
 
 export class PentominoManager {
