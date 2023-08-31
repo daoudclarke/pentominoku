@@ -1,4 +1,5 @@
 import {off} from "@svgdotjs/svg.js";
+import {getColumnRow} from "./restrictions";
 
 
 const pentominoOffsets = new Map();
@@ -12,7 +13,7 @@ pentominoOffsets.set("V", [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]]);
 pentominoOffsets.set("W", [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2]]);
 pentominoOffsets.set("X", [[1, 0], [0, 1], [1, 1], [2, 1], [1, 2]]);
 pentominoOffsets.set("Y", [[1, 0], [0, 1], [1, 1], [1, 2], [1, 3]]);
-pentominoOffsets.set("Z", [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2]]);
+pentominoOffsets.set("Z", [[0, 0], [0, 1], [1, 1], [2, 1], [2, 2]]);
 
 const pentominoColours = new Map();
 pentominoColours.set("F", "#c45dff");
@@ -25,9 +26,24 @@ pentominoColours.set("V", "#ffc300");
 pentominoColours.set("W", "#ff3d43");
 pentominoColours.set("X", "#79c27e");
 pentominoColours.set("Y", "#afa400");
+pentominoColours.set("Z", "#44932e");
+
+const pentominoNumbers = new Map();
+pentominoNumbers.set("F", 6);
+pentominoNumbers.set("L", 2);
+pentominoNumbers.set("N", 3);
+pentominoNumbers.set("P", 4);
+pentominoNumbers.set("T", 5);
+pentominoNumbers.set("U", 1);
+pentominoNumbers.set("V", 7);
+pentominoNumbers.set("W", 8);
+pentominoNumbers.set("X", 9);
+pentominoNumbers.set("Y", 1);
+pentominoNumbers.set("Z", 9);
+
 
 export class Pentomino {
-  constructor(type = "F", x = 0, y = 0, variation = 0) {
+  constructor(type = "F", x = 0, y = 0, variation = 0, arrangement = 0) {
     if (!pentominoOffsets.has(type)) {
       throw Error("Invalid type: " + type);
     }
@@ -88,6 +104,50 @@ export class Pentomino {
   toString() {
     return this.indexes.toString();
   }
+}
+
+
+function getBox(x, y) {
+  return ((x - x % 3) / 3) + ((y - y % 3) / 3) * 3;
+}
+
+
+class NumberedPentomino {
+  constructor(pentomino, number, indexes) {
+    this.pentomino = pentomino;
+    this.number = number;
+    this.indexes = indexes;
+
+    const [a1, a2] = indexes;
+    const [y1, x1] = getColumnRow(a1);
+    const box1 = getBox(x1, y1);
+    const [y2, x2] = getColumnRow(a2);
+    const box2 = getBox(x2, y2);
+
+    if (y1 === y2 || x1 === x2 || box1 === box2) {
+      throw Error("Invalid numbered pentomino");
+    }
+  }
+}
+
+function getNumberedPentominos(pentomino) {
+  const number = pentominoNumbers.get(pentomino.type);
+
+  const numberedPentominos = [];
+  for (let i=0; i<4; ++i) {
+    for (let j=i+1; j<5; ++j) {
+      const i1 = pentomino.indexes[i];
+      const i2 = pentomino.indexes[j];
+
+      try {
+        const newPentomino = new NumberedPentomino(pentomino, number, [i1, i2]);
+        numberedPentominos.push(newPentomino);
+      } catch (e) {
+      }
+    }
+  }
+
+  return numberedPentominos;
 }
 
 

@@ -104,13 +104,14 @@ const pentominos = [
   new Pentomino("F", 0, 0),
   new Pentomino("L", 3, 0),
   new Pentomino("N", 5, 0),
-  new Pentomino("P", 7, 0),
+  new Pentomino("P", 4, 0),
   new Pentomino("T", 0, 3),
-  new Pentomino("U", 6, 3),
+  new Pentomino("U", 7, 0, 5),
   new Pentomino("V", 4, 4),
   new Pentomino("W", 0, 6),
   new Pentomino("X", 2, 6),
   new Pentomino("Y", 7, 5),
+  new Pentomino("Z", 5, 3, 1),
 ]
 
 // const pentominos = [

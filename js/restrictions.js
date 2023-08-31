@@ -117,7 +117,7 @@ export const columnRestriction = combinedRestriction(
   [atLeastRestriction(columnNeighbourValues), atMostRestriction(columnNeighbourValues)])
 
 
-function getColumnRow(i) {
+export function getColumnRow(i) {
     const column = i % 9;
     const row = (i - column) / 9;
     return [column, row];
