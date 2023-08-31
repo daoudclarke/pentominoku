@@ -58,7 +58,7 @@ export class Sudoku {
   }
 
   drawRestriction(restriction) {
-    restriction.draw(this.svg, this.locations);
+    restriction.draw(this.svg, this.locations, this.rects);
   }
 
   setCurrentCellValue(value) {

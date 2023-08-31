@@ -43,7 +43,7 @@ pentominoNumbers.set("Z", 9);
 
 
 export class Pentomino {
-  constructor(type = "F", x = 0, y = 0, variation = 0, arrangement = 0) {
+  constructor(type = "F", x = 0, y = 0, variation = 0) {
     if (!pentominoOffsets.has(type)) {
       throw Error("Invalid type: " + type);
     }
@@ -89,15 +89,10 @@ export class Pentomino {
     console.log("Indexes", this.indexes);
   }
 
-  draw(svg, locations) {
+  draw(svg, locations, rects) {
     const colour = pentominoColours.get(this.type);
     for (const i of this.indexes) {
-      const square = svg.nested();
-      console.log("Index", i, locations[i]);
-      square.attr({x: locations[i].x - 45, y: locations[i].y - 45});
-      square.addClass('square');
-
-      const rect = square.rect(90, 90).attr({x: 0, y: 0, fill: colour, stroke: null, 'stroke-width': 0});
+      rects[i].rect.attr({fill: colour,});
     }
   }
 
@@ -173,6 +168,32 @@ function getVariations() {
 
 
 const pentominoVariations = getVariations();
+
+
+
+function getAllNumberedPentominos() {
+  let allNumbered = [];
+  for (let i=0; i<9; ++i) {
+    for (let j=0; j<9; ++j) {
+      for (const [type, variations] of pentominoVariations.entries()) {
+        for (const variation of variations) {
+          try {
+            const pentomino = new Pentomino(type, i, j, variation)
+            const newNumbered = getNumberedPentominos(pentomino);
+            allNumbered += newNumbered;
+          } catch (e) {
+
+          }
+        }
+      }
+    }
+  }
+  console.log("All numbered", allNumbered.length);
+  return allNumbered;
+}
+
+
+const allNumberedPentominos = getAllNumberedPentominos()
 
 
 export class PentominoManager {

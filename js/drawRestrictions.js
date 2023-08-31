@@ -8,7 +8,7 @@ export class Thermo {
     this.cells = cells;
   }
 
-  draw(draw, locations) {
+  draw(draw, locations, rects) {
     const svg = draw.nested();
     // const circle = svg.circle(30).attr({cx: locations[this.cells[0]].x, cy: locations[this.cells[0]].y,
     //   fill: thermoColor});
