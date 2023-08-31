@@ -83,6 +83,10 @@ export class Pentomino {
         throw Error("Position no good:" + new_x + " " + new_y);
       }
 
+      if (new_x === 4 && new_y === 4) {
+        throw Error("Disallowed position");
+      }
+
       this.indexes.push(new_y + new_x*9);
     }
     this.indexes.sort();
