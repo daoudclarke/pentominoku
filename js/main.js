@@ -9,7 +9,7 @@ import {
 } from "./restrictions";
 import {Thermo} from "./drawRestrictions";
 import {binaryToArray} from "./possible";
-import {Pentomino, PentominoManager} from "./pentomino";
+import {allNumberedPentominos, Pentomino, PentominoManager} from "./pentomino";
 
 const fixedPoints = new Map();
 
@@ -100,19 +100,22 @@ const sudoku = new Sudoku(onClick);
 // const thermoManager = new ThermoManager(solver, sudoku);
 // thermoManager.addThermo();
 
-const pentominos = [
-  new Pentomino("F", 0, 0),
-  new Pentomino("L", 3, 0),
-  new Pentomino("N", 5, 0),
-  new Pentomino("P", 4, 0),
-  new Pentomino("T", 0, 3),
-  new Pentomino("U", 7, 0, 5),
-  new Pentomino("V", 4, 4),
-  new Pentomino("W", 0, 6),
-  new Pentomino("X", 2, 6),
-  new Pentomino("Y", 7, 5),
-  new Pentomino("Z", 5, 3, 1),
-]
+let p = 0;
+const pentominos = [allNumberedPentominos[p]];
+
+// const pentominos = [
+//   new Pentomino("F", 0, 0),
+//   new Pentomino("L", 3, 0),
+//   new Pentomino("N", 5, 0),
+//   new Pentomino("P", 4, 0),
+//   new Pentomino("T", 0, 3),
+//   new Pentomino("U", 7, 0, 5),
+//   new Pentomino("V", 4, 4),
+//   new Pentomino("W", 0, 6),
+//   new Pentomino("X", 2, 6),
+//   new Pentomino("Y", 7, 5),
+//   new Pentomino("Z", 5, 3, 1),
+// ]
 
 // const pentominos = [
 //   new Pentomino("F", 0, 0, 0),
@@ -161,6 +164,10 @@ document.onkeydown = function (e) {
     thermoManager.addThermo();
   } else if (e.key === 'd') {
     thermoManager.removeThermo();
+  } else if (e.key === 'p') {
+    ++p;
+    pentominoManager.pentominos = [allNumberedPentominos[p]];
+    pentominoManager.draw()
   } else if (allowedChars.has(e.key)) {
     sudoku.setCurrentCellValue(e.key);
     sudoku.setCurrentCellManual();

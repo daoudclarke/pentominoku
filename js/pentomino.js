@@ -123,6 +123,17 @@ class NumberedPentomino {
       throw Error("Invalid numbered pentomino");
     }
   }
+
+  draw(svg, locations, rects) {
+    this.pentomino.draw(svg, locations, rects);
+    for (const i of this.indexes) {
+      rects[i].text.text(this.number.toString());
+    }
+  }
+
+  toString() {
+    return this.pentomino.toString + " - " + this.indexes.toString();
+  }
 }
 
 function getNumberedPentominos(pentomino) {
@@ -172,7 +183,7 @@ const pentominoVariations = getVariations();
 
 
 function getAllNumberedPentominos() {
-  let allNumbered = [];
+  const allNumbered = [];
   for (let i=0; i<9; ++i) {
     for (let j=0; j<9; ++j) {
       for (const [type, variations] of pentominoVariations.entries()) {
@@ -180,7 +191,7 @@ function getAllNumberedPentominos() {
           try {
             const pentomino = new Pentomino(type, i, j, variation)
             const newNumbered = getNumberedPentominos(pentomino);
-            allNumbered += newNumbered;
+            allNumbered.push(...newNumbered);
           } catch (e) {
 
           }
@@ -193,7 +204,7 @@ function getAllNumberedPentominos() {
 }
 
 
-const allNumberedPentominos = getAllNumberedPentominos()
+export const allNumberedPentominos = getAllNumberedPentominos();
 
 
 export class PentominoManager {
