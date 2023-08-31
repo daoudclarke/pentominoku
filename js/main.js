@@ -129,7 +129,8 @@ const pentominos = [allNumberedPentominos[p]];
 // ]
 
 const pentominoManager = new PentominoManager(sudoku, pentominos);
-pentominoManager.draw()
+pentominoManager.draw();
+pentominoManager.search();
 
 
 function onClick(i) {

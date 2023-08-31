@@ -90,7 +90,6 @@ export class Pentomino {
       this.indexes.push(new_y + new_x*9);
     }
     this.indexes.sort();
-    console.log("Indexes", this.indexes);
   }
 
   draw(svg, locations, rects) {
@@ -126,6 +125,14 @@ class NumberedPentomino {
     if (y1 === y2 || x1 === x2 || box1 === box2) {
       throw Error("Invalid numbered pentomino");
     }
+
+    this.s = new Set(pentomino.indexes);
+    this.s.add("c" + x1);
+    this.s.add("c" + x2);
+    this.s.add("r" + y1);
+    this.s.add("r" + y2);
+    this.s.add("b" + box1);
+    this.s.add("b" + box2);
   }
 
   draw(svg, locations, rects) {
@@ -221,6 +228,26 @@ export class PentominoManager {
     this.sudoku.draw();
     for (let pentomino of this.pentominos) {
       this.sudoku.drawRestriction(pentomino);
+    }
+  }
+
+  search(maxDepth = 1) {
+    this.pentominos = [];
+
+    // Choose the set item that has the lowest options for pentominos to cover it
+    for (let depth=0; depth < maxDepth; ++depth) {
+      const itemCounts = new Map();
+      for (const pentomino of allNumberedPentominos) {
+        for (const i of pentomino.s) {
+          if (itemCounts.has(i)) {
+            itemCounts.set(i, itemCounts.get(i) + 1);
+          } else {
+            itemCounts.set(i, 0);
+          }
+        }
+      }
+      console.log("Item counts", itemCounts);
+
     }
   }
 }
