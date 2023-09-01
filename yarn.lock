@@ -3031,6 +3031,11 @@
     "miller-rabin" "^4.0.0"
     "randombytes" "^2.0.0"
 
+"dlxlib@^2.0.0-alpha.1":
+  "integrity" "sha512-4mgZ/mNiX0lkJH1ivwfejc6ju/5AsxEocEW0ipvWQFoK1kYtkSN/SHlUyn+vKemhxf3CPMFqqQauQCGR9zIdBw=="
+  "resolved" "https://registry.npmjs.org/dlxlib/-/dlxlib-2.0.0-alpha.1.tgz"
+  "version" "2.0.0-alpha.1"
+
 "dom-serializer@0":
   "integrity" "sha512-2/xPb3ORsQ42nHYiSunXkDjPLBaEj/xTwUO4B7XCZQTRk7EBtTOPaygh10YAAh2OI1Qrp6NWfpAhzswj0ydt9g=="
   "resolved" "https://registry.npmjs.org/dom-serializer/-/dom-serializer-0.2.2.tgz"

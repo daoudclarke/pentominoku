@@ -1,15 +1,9 @@
 import {allowedChars, Sudoku} from "./draw";
 import {Solver} from "./solver";
-import {
-  boxRestriction,
-  columnRestriction,
-  kingsMoveRestriction, PrimeNumberRestriction,
-  rowRestriction,
-  ThermoRestriction
-} from "./restrictions";
+import {boxRestriction, columnRestriction, PrimeNumberRestriction, rowRestriction} from "./restrictions";
 import {Thermo} from "./drawRestrictions";
 import {binaryToArray} from "./possible";
-import {allNumberedPentominos, Pentomino, PentominoManager} from "./pentomino";
+import {allItems, allNumberedPentominos, PentominoManager} from "./pentomino";
 
 const fixedPoints = new Map();
 
@@ -130,7 +124,7 @@ const pentominos = [allNumberedPentominos[p]];
 
 const pentominoManager = new PentominoManager(sudoku, pentominos);
 pentominoManager.draw();
-pentominoManager.search();
+// search();
 
 
 function onClick(i) {
@@ -151,6 +145,31 @@ function onClick(i) {
 //   const possibleDecimal = possibleBinary.map((x) => binaryToArray(x));
 //   sudoku.updatePossible(possibleDecimal);
 // }
+
+
+const myWorker = new Worker("worker.js");
+
+let bestResult = [];
+let bestNum = 0;
+myWorker.onmessage = (e) => {
+  const step = e.data.partialSolution;
+  if (step.length > bestResult.length) {
+    const numPentominos = step.filter((x) => x < allNumberedPentominos.length).length;
+    if (numPentominos > bestNum) {
+      bestNum = numPentominos;
+      bestResult = step;
+      console.log("New best", step);
+
+      pentominoManager.pentominos = bestResult.map(x => allItems[x]);
+      pentominoManager.draw();
+    }
+
+  }
+
+
+  // console.log("Message", e);
+  // myWorker.terminate();
+};
 
 
 document.onkeydown = function (e) {

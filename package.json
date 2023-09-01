@@ -19,6 +19,7 @@
     "ts-jest": "^26.1.0"
   },
   "dependencies": {
-    "@svgdotjs/svg.js": "^3.0.16"
+    "@svgdotjs/svg.js": "^3.0.16",
+    "dlxlib": "^2.0.0-alpha.1"
   }
 }

@@ -1,5 +1,5 @@
-import {off} from "@svgdotjs/svg.js";
 import {getColumnRow} from "./restrictions";
+import {Dlx} from "dlxlib";
 
 
 const pentominoOffsets = new Map();
@@ -40,6 +40,10 @@ pentominoNumbers.set("W", 8);
 pentominoNumbers.set("X", 9);
 pentominoNumbers.set("Y", 1);
 pentominoNumbers.set("Z", 9);
+
+
+const disallowedPentominoIndexes = new Set();
+disallowedPentominoIndexes.add(40);
 
 
 export class Pentomino {
@@ -83,11 +87,12 @@ export class Pentomino {
         throw Error("Position no good:" + new_x + " " + new_y);
       }
 
-      if (new_x === 4 && new_y === 4) {
+      const index = new_y + new_x*9;
+      if (disallowedPentominoIndexes.has(index)) {
         throw Error("Disallowed position");
       }
 
-      this.indexes.push(new_y + new_x*9);
+      this.indexes.push(index);
     }
     this.indexes.sort();
   }
@@ -126,13 +131,15 @@ class NumberedPentomino {
       throw Error("Invalid numbered pentomino");
     }
 
-    this.s = new Set(pentomino.indexes);
-    this.s.add("c" + x1);
-    this.s.add("c" + x2);
-    this.s.add("r" + y1);
-    this.s.add("r" + y2);
-    this.s.add("b" + box1);
-    this.s.add("b" + box2);
+    this.s = new Set(pentomino.indexes.map(x => "s" + x));
+    this.s.add("c" + x1 + "_" + number);
+    this.s.add("c" + x2 + "_" + number);
+    this.s.add("r" + y1 + "_" + number);
+    this.s.add("r" + y2 + "_" + number);
+    this.s.add("b" + box1 + "_" + number);
+    this.s.add("b" + box2 + "_" + number);
+    this.s.add("i" + a1);
+    this.s.add("i" + a2);
   }
 
   draw(svg, locations, rects) {
@@ -218,6 +225,90 @@ function getAllNumberedPentominos() {
 export const allNumberedPentominos = getAllNumberedPentominos();
 
 
+class SudokuNumber {
+  constructor(x, y, number) {
+    this.index = x + y*9;
+    this.number = number;
+
+    const box = getBox(x, y);
+
+    this.s = new Set();
+    this.s.add("c" + x + "_" + number);
+    this.s.add("r" + y + "_" + number);
+    this.s.add("b" + box + "_" + number);
+    this.s.add("i" + this.index);
+  }
+
+  draw(svg, locations, rects) {
+    rects[this.index].text.text(this.number.toString());
+  }
+
+}
+
+
+function getAllNumbers() {
+  const numbers = [];
+  for (let x=0; x<9; ++x) {
+    for (let y=0; y<9; ++y) {
+      for (let i=1; i<=9; ++i) {
+        const number = new SudokuNumber(x, y, i);
+        numbers.push(number);
+      }
+    }
+  }
+  return numbers;
+}
+
+const allSudokuNumbers = getAllNumbers();
+
+
+export const allItems = allNumberedPentominos.concat(allSudokuNumbers);
+
+function getMatrix() {
+  let index=0;
+
+  const keys = new Map();
+  for (const k of ["c", "r", "b"]) {
+    for (let i=0; i<9; ++i) {
+      for (let j=1; j<=9; ++j) {
+        keys.set(k + i + "_" + j, index);
+        ++index;
+      }
+    }
+  }
+  for (const k of ["s", "i"]) {
+    for (let i=0; i<81; ++i) {
+      if (k === "s" && disallowedPentominoIndexes.has(i)) {
+        continue;
+      }
+
+      keys.set(k + i, index);
+      ++index;
+    }
+  }
+
+  console.log("Keys", keys);
+  const rows = [];
+  for (const item of allItems) {
+    const row = new Array(keys.size).fill(0);
+    for (const i of item.s) {
+      if (!keys.has(i)) {
+        throw Error("Missing " + i);
+      }
+
+      row[keys.get(i)] = 1;
+    }
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+
+const matrix = getMatrix();
+
+
+
 export class PentominoManager {
   constructor(sudoku, pentominos) {
     this.sudoku = sudoku;
@@ -230,25 +321,18 @@ export class PentominoManager {
       this.sudoku.drawRestriction(pentomino);
     }
   }
+}
 
-  search(maxDepth = 1) {
-    this.pentominos = [];
-
-    // Choose the set item that has the lowest options for pentominos to cover it
-    for (let depth=0; depth < maxDepth; ++depth) {
-      const itemCounts = new Map();
-      for (const pentomino of allNumberedPentominos) {
-        for (const i of pentomino.s) {
-          if (itemCounts.has(i)) {
-            itemCounts.set(i, itemCounts.get(i) + 1);
-          } else {
-            itemCounts.set(i, 0);
-          }
-        }
-      }
-      console.log("Item counts", itemCounts);
-
-    }
-  }
+export function search(onStep) {
+  console.log("Matrix", matrix);
+  // const onSolution = e =>
+  //   console.log(`solution[${e.solutionIndex}]: ${e.solution}`);
+  // const onStep = e =>
+  //   console.log(`step[${e.stepIndex}]: ${e.partialSolution}`);
+  const dlx = new Dlx();
+  dlx.on('step', onStep);
+  // dlx.on('solution', onSolution);
+  const result = dlx.solve(matrix);
+  console.log("Result", result);
 }
 
