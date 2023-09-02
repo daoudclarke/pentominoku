@@ -33,13 +33,13 @@ pentominoNumbers.set("F", 6);
 pentominoNumbers.set("L", 2);
 pentominoNumbers.set("N", 3);
 pentominoNumbers.set("P", 4);
-pentominoNumbers.set("T", 5);
+pentominoNumbers.set("T", 3);
 pentominoNumbers.set("U", 1);
 pentominoNumbers.set("V", 7);
 pentominoNumbers.set("W", 8);
 pentominoNumbers.set("X", 9);
 pentominoNumbers.set("Y", 1);
-pentominoNumbers.set("Z", 9);
+pentominoNumbers.set("Z", 2);
 
 
 const disallowedPentominoIndexes = new Set();
