@@ -165,7 +165,7 @@ myWorker.onmessage = (e) => {
   const step = e.data.partialSolution;
   if (step.length > bestResult.length) {
     const numPentominos = step.filter((x) => x < allNumberedPentominos.length).length;
-    if (numPentominos > bestNum) {
+    if (numPentominos >= bestNum) {
       bestNum = numPentominos;
       bestResult = step;
       console.log("New best", step);

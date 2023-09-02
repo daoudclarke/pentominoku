@@ -270,20 +270,13 @@ function getAllNumbers() {
 const allSudokuNumbers = getAllNumbers();
 
 
-export const allItems = allNumberedPentominos.concat(allSudokuNumbers);
+// export const allItems = allNumberedPentominos.concat(allSudokuNumbers);
+export const allItems = allNumberedPentominos;
+const keys = new Map();
 
 function getMatrix() {
   let index=0;
 
-  const keys = new Map();
-  for (const k of ["c", "r", "b"]) {
-    for (let i=0; i<9; ++i) {
-      for (let j=1; j<=9; ++j) {
-        keys.set(k + i + "_" + j, index);
-        ++index;
-      }
-    }
-  }
   for (const k of ["s", "i"]) {
     for (let i=0; i<81; ++i) {
       if (k === "s" && disallowedPentominoIndexes.has(i)) {
@@ -292,6 +285,14 @@ function getMatrix() {
 
       keys.set(k + i, index);
       ++index;
+    }
+  }
+  for (const k of ["c", "r", "b"]) {
+    for (let i=0; i<9; ++i) {
+      for (let j=1; j<=9; ++j) {
+        keys.set(k + i + "_" + j, index);
+        ++index;
+      }
     }
   }
 
@@ -340,7 +341,7 @@ export function search(onStep) {
   const dlx = new Dlx();
   dlx.on('step', onStep);
   // dlx.on('solution', onSolution);
-  const result = dlx.solve(matrix);
+  const result = dlx.solve(matrix, {numPrimaryColumns: keys.get("s80")});
   console.log("Result", result);
 }
 
