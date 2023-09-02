@@ -122,9 +122,9 @@ class NumberedPentomino {
     this.indexes = indexes;
 
     const [a1, a2] = indexes;
-    const [y1, x1] = getColumnRow(a1);
+    const [x1, y1] = getColumnRow(a1);
     const box1 = getBox(x1, y1);
-    const [y2, x2] = getColumnRow(a2);
+    const [x2, y2] = getColumnRow(a2);
     const box2 = getBox(x2, y2);
 
     if (y1 === y2 || x1 === x2 || box1 === box2) {
@@ -145,6 +145,10 @@ class NumberedPentomino {
   draw(svg, locations, rects) {
     this.pentomino.draw(svg, locations, rects);
     for (const i of this.indexes) {
+      if (rects[i].text.text()) {
+        throw Error("Existing text")
+      }
+
       rects[i].text.text(this.number.toString());
     }
   }
@@ -225,7 +229,7 @@ function getAllNumberedPentominos() {
 export const allNumberedPentominos = getAllNumberedPentominos();
 
 
-class SudokuNumber {
+export class SudokuNumber {
   constructor(x, y, number) {
     this.index = x + y*9;
     this.number = number;
@@ -240,6 +244,10 @@ class SudokuNumber {
   }
 
   draw(svg, locations, rects) {
+      if (rects[this.index].text.text()) {
+        throw Error("Existing text");
+      }
+
     rects[this.index].text.text(this.number.toString());
   }
 

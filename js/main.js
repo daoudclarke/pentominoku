@@ -3,7 +3,7 @@ import {Solver} from "./solver";
 import {boxRestriction, columnRestriction, PrimeNumberRestriction, rowRestriction} from "./restrictions";
 import {Thermo} from "./drawRestrictions";
 import {binaryToArray} from "./possible";
-import {allItems, allNumberedPentominos, PentominoManager} from "./pentomino";
+import {allItems, allNumberedPentominos, PentominoManager, SudokuNumber} from "./pentomino";
 
 const fixedPoints = new Map();
 
@@ -95,7 +95,17 @@ const sudoku = new Sudoku(onClick);
 // thermoManager.addThermo();
 
 let p = 0;
-const pentominos = [allNumberedPentominos[p]];
+// const pentominos = [allNumberedPentominos[p]];
+
+const pentomino = allNumberedPentominos[p];
+const sudokuNumber = new SudokuNumber(2, 0, 2);
+
+// console.log("Pentomino", pentomino);
+// console.log("Number", sudokuNumber);
+//
+// const pentominos = [pentomino, sudokuNumber];
+
+const pentominos = [];
 
 // const pentominos = [
 //   new Pentomino("F", 0, 0),
