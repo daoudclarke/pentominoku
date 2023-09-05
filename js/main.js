@@ -3,7 +3,7 @@ import {Solver} from "./solver";
 import {boxRestriction, columnRestriction, PrimeNumberRestriction, rowRestriction} from "./restrictions";
 import {Thermo} from "./drawRestrictions";
 import {binaryToArray} from "./possible";
-import {allItems, allNumberedPentominos, PentominoManager, SudokuNumber} from "./pentomino";
+import {PentominoManager} from "./pentomino";
 
 const fixedPoints = new Map();
 
@@ -94,11 +94,11 @@ const sudoku = new Sudoku(onClick);
 // const thermoManager = new ThermoManager(solver, sudoku);
 // thermoManager.addThermo();
 
-let p = 0;
+// let p = 0;
 // const pentominos = [allNumberedPentominos[p]];
 
-const pentomino = allNumberedPentominos[p];
-const sudokuNumber = new SudokuNumber(2, 0, 2);
+// const pentomino = allNumberedPentominos[p];
+// const sudokuNumber = new SudokuNumber(2, 0, 2);
 
 // console.log("Pentomino", pentomino);
 // console.log("Number", sudokuNumber);
@@ -137,8 +137,19 @@ pentominoManager.draw();
 // search();
 
 
+let myWorker;
+
+const starredIndexes = new Set();
 function onClick(i) {
-  thermoManager.addCell(i);
+  if (myWorker) {
+    myWorker.terminate();
+  }
+  myWorker = new Worker("worker.js");
+  // thermoManager.addCell(i);
+  // starredIndexes.add(i);
+  pentominoManager.toggleStar(i);
+  startWorker();
+  myWorker.postMessage(starredIndexes);
 }
 
 
@@ -157,29 +168,32 @@ function onClick(i) {
 // }
 
 
-const myWorker = new Worker("worker.js");
+function startWorker() {
 
-let bestResult = [];
-let bestNum = 0;
-myWorker.onmessage = (e) => {
-  const step = e.data.partialSolution;
-  if (step.length > bestResult.length) {
-    const numPentominos = step.filter((x) => x < allNumberedPentominos.length).length;
-    if (numPentominos >= bestNum) {
-      bestNum = numPentominos;
-      bestResult = step;
-      console.log("New best", step);
+  let bestResult = [];
+  let bestNum = 0;
+  myWorker.onmessage = (e) => {
+    console.log("Message from worker", e);
+    // const step = e.data.partialSolution;
+    // if (step.length > bestResult.length) {
+    //   const numPentominos = step.filter((x) => x < allNumberedPentominos.length).length;
+    //   if (numPentominos >= bestNum) {
+    //     bestNum = numPentominos;
+    //     bestResult = step;
+    //     console.log("New best", step);
+    //
+    //     pentominoManager.pentominos = bestResult.map(x => allItems[x]);
+    //     pentominoManager.draw();
+    //   }
+    //
+    // }
 
-      pentominoManager.pentominos = bestResult.map(x => allItems[x]);
-      pentominoManager.draw();
-    }
 
-  }
+    // console.log("Message", e);
+    // myWorker.terminate();
+  };
 
-
-  // console.log("Message", e);
-  // myWorker.terminate();
-};
+}
 
 
 document.onkeydown = function (e) {

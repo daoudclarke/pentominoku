@@ -1,5 +1,6 @@
 import {getColumnRow} from "./restrictions";
 import {Dlx} from "dlxlib";
+import {on} from "@svgdotjs/svg.js";
 
 
 const pentominoOffsets = new Map();
@@ -203,32 +204,6 @@ function getVariations() {
 const pentominoVariations = getVariations();
 
 
-
-function getAllNumberedPentominos() {
-  const allNumbered = [];
-  for (let i=0; i<9; ++i) {
-    for (let j=0; j<9; ++j) {
-      for (const [type, variations] of pentominoVariations.entries()) {
-        for (const variation of variations) {
-          try {
-            const pentomino = new Pentomino(type, i, j, variation)
-            const newNumbered = getNumberedPentominos(pentomino);
-            allNumbered.push(...newNumbered);
-          } catch (e) {
-
-          }
-        }
-      }
-    }
-  }
-  console.log("All numbered", allNumbered.length);
-  return allNumbered;
-}
-
-
-export const allNumberedPentominos = getAllNumberedPentominos();
-
-
 export class SudokuNumber {
   constructor(x, y, number) {
     this.index = x + y*9;
@@ -254,74 +229,20 @@ export class SudokuNumber {
 }
 
 
-function getAllNumbers() {
-  const numbers = [];
-  for (let x=0; x<9; ++x) {
-    for (let y=0; y<9; ++y) {
-      for (let i=1; i<=9; ++i) {
-        const number = new SudokuNumber(x, y, i);
-        numbers.push(number);
-      }
-    }
-  }
-  return numbers;
-}
-
-const allSudokuNumbers = getAllNumbers();
-
-
-// export const allItems = allNumberedPentominos.concat(allSudokuNumbers);
-export const allItems = allNumberedPentominos;
-const keys = new Map();
-
-function getMatrix() {
-  let index=0;
-
-  for (const k of ["s", "i"]) {
-    for (let i=0; i<81; ++i) {
-      if (k === "s" && disallowedPentominoIndexes.has(i)) {
-        continue;
-      }
-
-      keys.set(k + i, index);
-      ++index;
-    }
-  }
-  for (const k of ["c", "r", "b"]) {
-    for (let i=0; i<9; ++i) {
-      for (let j=1; j<=9; ++j) {
-        keys.set(k + i + "_" + j, index);
-        ++index;
-      }
-    }
-  }
-
-  console.log("Keys", keys);
-  const rows = [];
-  for (const item of allItems) {
-    const row = new Array(keys.size).fill(0);
-    for (const i of item.s) {
-      if (!keys.has(i)) {
-        throw Error("Missing " + i);
-      }
-
-      row[keys.get(i)] = 1;
-    }
-    rows.push(row);
-  }
-
-  return rows;
-}
-
-
-const matrix = getMatrix();
-
-
 
 export class PentominoManager {
   constructor(sudoku, pentominos) {
     this.sudoku = sudoku;
     this.pentominos = pentominos;
+    this.starredIndexes = new Set();
+  }
+
+  toggleStar(index) {
+    if (this.starredIndexes.has(index)) {
+      this.starredIndexes.delete(index);
+    } else {
+      this.starredIndexes.add(index);
+    }
   }
 
   draw() {
@@ -332,16 +253,123 @@ export class PentominoManager {
   }
 }
 
-export function search(onStep) {
-  console.log("Matrix", matrix);
-  // const onSolution = e =>
-  //   console.log(`solution[${e.solutionIndex}]: ${e.solution}`);
-  // const onStep = e =>
-  //   console.log(`step[${e.stepIndex}]: ${e.partialSolution}`);
-  const dlx = new Dlx();
-  dlx.on('step', onStep);
-  // dlx.on('solution', onSolution);
-  const result = dlx.solve(matrix, {numPrimaryColumns: keys.get("s80")});
-  console.log("Result", result);
+
+export class PentominoSolver {
+  constructor(starredIndexes, onUpdate) {
+    if (!starredIndexes) {
+      throw Error("No starred indexes");
+    }
+    this.starredIndexes = starredIndexes;
+    this.allNumberedPentominos = this.getAllNumberedPentominos();
+    this.allSudokuNumbers = this.getAllNumbers();
+    this.allItems = this.allNumberedPentominos;
+    // this.allItems = allNumberedPentominos.concat(allSudokuNumbers);
+    this.keys = new Map();
+    this.matrix = this.getMatrix();
+    this.onUpdate = onUpdate;
+  }
+
+  getAllNumberedPentominos() {
+    const allNumbered = [];
+    for (let i=0; i<9; ++i) {
+      for (let j=0; j<9; ++j) {
+        for (const [type, variations] of pentominoVariations.entries()) {
+          for (const variation of variations) {
+            try {
+              const pentomino = new Pentomino(type, i, j, variation)
+              const newNumbered = getNumberedPentominos(pentomino);
+
+              // Star means that any pentomino that has that index has to be numbered
+              for (const numberedPentomino of newNumbered) {
+                if (this.isAllowed(numberedPentomino)) {
+                  allNumbered.push(numberedPentomino);
+                }
+              }
+
+            } catch (e) {
+              console.log("Got ", e)
+            }
+          }
+        }
+      }
+    }
+    console.log("All numbered", allNumbered.length);
+    return allNumbered;
+  }
+
+  isAllowed(numberedPentomino) {
+    const numberedIndexes = new Set(numberedPentomino.indexes);
+    const unNumberedIndexes = numberedPentomino.pentomino.indexes.filter(i => !numberedIndexes.has(i));
+    console.log("Numbered p", numberedPentomino, unNumberedIndexes);
+    return !unNumberedIndexes.some(i => this.starredIndexes.has(i));
+  }
+
+  getAllNumbers() {
+    const numbers = [];
+    for (let x=0; x<9; ++x) {
+      for (let y=0; y<9; ++y) {
+        for (let i=1; i<=9; ++i) {
+          const number = new SudokuNumber(x, y, i);
+          numbers.push(number);
+        }
+      }
+    }
+    return numbers;
+  }
+
+  getMatrix() {
+    let index=0;
+
+    for (const k of ["s", "i"]) {
+      for (let i=0; i<81; ++i) {
+        if (k === "s" && disallowedPentominoIndexes.has(i)) {
+          continue;
+        }
+
+        this.keys.set(k + i, index);
+        ++index;
+      }
+    }
+    for (const k of ["c", "r", "b"]) {
+      for (let i=0; i<9; ++i) {
+        for (let j=1; j<=9; ++j) {
+          this.keys.set(k + i + "_" + j, index);
+          ++index;
+        }
+      }
+    }
+
+    console.log("Keys", this.keys);
+    const rows = [];
+    for (const item of this.allItems) {
+      const row = new Array(this.keys.size).fill(0);
+      for (const i of item.s) {
+        if (!this.keys.has(i)) {
+          throw Error("Missing " + i);
+        }
+
+        row[this.keys.get(i)] = 1;
+      }
+      rows.push(row);
+    }
+
+    return rows;
+  }
+
+  search() {
+    console.log("Matrix", this.matrix);
+    // const onSolution = e =>
+    //   console.log(`solution[${e.solutionIndex}]: ${e.solution}`);
+    // const onStep = e =>
+    //   console.log(`step[${e.stepIndex}]: ${e.partialSolution}`);
+    const dlx = new Dlx();
+    dlx.on('step', (e) => {
+      const pentominos = e.partialSolution.map(i => this.allItems[i]);
+      this.onUpdate(pentominos);
+    });
+    // dlx.on('solution', onSolution);
+    const result = dlx.solve(this.matrix, {numPrimaryColumns: this.keys.get("s80")});
+    console.log("Result", result);
+  }
 }
 

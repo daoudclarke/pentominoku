@@ -1,4 +1,4 @@
-import {search} from "./pentomino";
+import {PentominoSolver} from "./pentomino";
 
 
 
@@ -8,4 +8,8 @@ function onStep(e) {
 }
 
 
-search(onStep);
+onmessage = (e) => {
+  console.log("Worker received", e.data);
+  const solver = new PentominoSolver(e.data, onStep);
+  solver.search();
+};
