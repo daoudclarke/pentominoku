@@ -34,7 +34,7 @@ pentominoNumbers.set("F", 6);
 pentominoNumbers.set("L", 2);
 pentominoNumbers.set("N", 3);
 pentominoNumbers.set("P", 4);
-pentominoNumbers.set("T", 3);
+pentominoNumbers.set("T", 5);
 pentominoNumbers.set("U", 1);
 pentominoNumbers.set("V", 7);
 pentominoNumbers.set("W", 8);
@@ -267,6 +267,15 @@ export class Stars {
 }
 
 
+// https://stackoverflow.com/a/12646864
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+
 export class PentominoSolver {
   constructor(starredIndexes, onUpdate) {
     if (!starredIndexes) {
@@ -274,6 +283,7 @@ export class PentominoSolver {
     }
     this.starredIndexes = starredIndexes;
     this.allNumberedPentominos = this.getAllNumberedPentominos();
+    shuffleArray(this.allNumberedPentominos);
     this.allSudokuNumbers = this.getAllNumbers();
     this.allItems = this.allNumberedPentominos;
     // this.allItems = allNumberedPentominos.concat(allSudokuNumbers);
@@ -370,6 +380,8 @@ export class PentominoSolver {
   }
 
   search() {
+    // TODO: Find one solution, or give up after n steps. Then randomize the order and try again.
+    //       Find pentominos that don't change between solutions
     console.log("Matrix", this.matrix);
     // const onSolution = e =>
     //   console.log(`solution[${e.solutionIndex}]: ${e.solution}`);
