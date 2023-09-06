@@ -3,7 +3,7 @@ import {Solver} from "./solver";
 import {boxRestriction, columnRestriction, PrimeNumberRestriction, rowRestriction} from "./restrictions";
 import {Thermo} from "./drawRestrictions";
 import {binaryToArray} from "./possible";
-import {PentominoManager} from "./pentomino";
+import {NumberedPentomino, Pentomino, PentominoManager} from "./pentomino";
 
 const fixedPoints = new Map();
 
@@ -140,6 +140,8 @@ pentominoManager.draw();
 let myWorker;
 
 const starredIndexes = new Set();
+let bestResult = [];
+let bestNum = 0;
 function onClick(i) {
   if (myWorker) {
     myWorker.terminate();
@@ -147,10 +149,21 @@ function onClick(i) {
   myWorker = new Worker("worker.js");
   // thermoManager.addCell(i);
   // starredIndexes.add(i);
-  pentominoManager.toggleStar(i);
+  toggleStar(i);
+  bestResult = [];
+  bestNum = 0;
   startWorker();
   myWorker.postMessage(starredIndexes);
 }
+
+function toggleStar(index) {
+  if (starredIndexes.has(index)) {
+    starredIndexes.delete(index);
+  } else {
+    starredIndexes.add(index);
+  }
+}
+
 
 
 // function updatePossible() {
@@ -170,23 +183,22 @@ function onClick(i) {
 
 function startWorker() {
 
-  let bestResult = [];
-  let bestNum = 0;
   myWorker.onmessage = (e) => {
-    console.log("Message from worker", e);
-    // const step = e.data.partialSolution;
-    // if (step.length > bestResult.length) {
-    //   const numPentominos = step.filter((x) => x < allNumberedPentominos.length).length;
-    //   if (numPentominos >= bestNum) {
-    //     bestNum = numPentominos;
-    //     bestResult = step;
-    //     console.log("New best", step);
-    //
-    //     pentominoManager.pentominos = bestResult.map(x => allItems[x]);
-    //     pentominoManager.draw();
-    //   }
-    //
-    // }
+    const step = e.data;
+    if (step.length > bestResult.length) {
+      // const numPentominos = step.filter((x) => x < allNumberedPentominos.length).length;
+      // if (numPentominos >= bestNum) {
+      bestNum = step.length;
+      bestResult = step;
+      console.log("New best", step);
+
+      const pentominos = step.map(p => new NumberedPentomino(new Pentomino(p.pentomino), p.number, p.indexes));
+      pentominoManager.pentominos = pentominos;
+      pentominoManager.starredIndexes = starredIndexes;
+      pentominoManager.draw();
+      // }
+
+    }
 
 
     // console.log("Message", e);

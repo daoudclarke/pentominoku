@@ -48,17 +48,22 @@ disallowedPentominoIndexes.add(40);
 
 
 export class Pentomino {
-  constructor(type = "F", x = 0, y = 0, variation = 0) {
+  constructor({type = "F", x = 0, y = 0, variation = 0, indexes = null}) {
     if (!pentominoOffsets.has(type)) {
       throw Error("Invalid type: " + type);
     }
 
     this.type = type;
 
+    if (indexes !== null) {
+      this.indexes = indexes;
+      return;
+    }
+
     const originalOffsets = pentominoOffsets.get(type);
     const offsets = [];
-    const maxX = Math.max(...originalOffsets.map(x => x[0]));
-    const maxY = Math.max(...originalOffsets.map(x => x[1]));
+    const maxX = Math.max(...originalOffsets.map(offset => offset[0]));
+    const maxY = Math.max(...originalOffsets.map(offset => offset[1]));
 
     // Rotate and flip the original
     for (const [ox, oy] of originalOffsets) {
@@ -116,7 +121,7 @@ function getBox(x, y) {
 }
 
 
-class NumberedPentomino {
+export class NumberedPentomino {
   constructor(pentomino, number, indexes) {
     this.pentomino = pentomino;
     this.number = number;
@@ -186,7 +191,7 @@ function getVariations() {
     const seen = new Set();
     const variations = [];
     for (let variation=0; variation<8; ++variation) {
-      const pentomino = new Pentomino(type, 0, 0, variation);
+      const pentomino = new Pentomino({type: type, x: 0, y: 0, variation: variation});
       const pentominoStr = pentomino.toString();
       if (seen.has(pentominoStr)) {
         continue;
@@ -237,18 +242,26 @@ export class PentominoManager {
     this.starredIndexes = new Set();
   }
 
-  toggleStar(index) {
-    if (this.starredIndexes.has(index)) {
-      this.starredIndexes.delete(index);
-    } else {
-      this.starredIndexes.add(index);
-    }
-  }
-
   draw() {
     this.sudoku.draw();
     for (let pentomino of this.pentominos) {
       this.sudoku.drawRestriction(pentomino);
+    }
+    const stars = new Stars(this.starredIndexes);
+    this.sudoku.drawRestriction(stars);
+  }
+}
+
+
+export class Stars {
+  constructor(starIndexes) {
+    this.starIndexes = starIndexes;
+  }
+
+  draw(svg, locations, rects) {
+    for (const i of this.starIndexes) {
+      const rect = rects[i];
+      rect.square.polygon("50,5 20,90 95,30 5,30 80,90").attr({fill: "grey"});
     }
   }
 }
@@ -270,13 +283,14 @@ export class PentominoSolver {
   }
 
   getAllNumberedPentominos() {
+    console.log("Getting all numbered", this.starredIndexes);
     const allNumbered = [];
     for (let i=0; i<9; ++i) {
       for (let j=0; j<9; ++j) {
         for (const [type, variations] of pentominoVariations.entries()) {
           for (const variation of variations) {
             try {
-              const pentomino = new Pentomino(type, i, j, variation)
+              const pentomino = new Pentomino({type: type, x: i, y: j, variation: variation})
               const newNumbered = getNumberedPentominos(pentomino);
 
               // Star means that any pentomino that has that index has to be numbered
@@ -287,7 +301,7 @@ export class PentominoSolver {
               }
 
             } catch (e) {
-              console.log("Got ", e)
+
             }
           }
         }
@@ -300,7 +314,6 @@ export class PentominoSolver {
   isAllowed(numberedPentomino) {
     const numberedIndexes = new Set(numberedPentomino.indexes);
     const unNumberedIndexes = numberedPentomino.pentomino.indexes.filter(i => !numberedIndexes.has(i));
-    console.log("Numbered p", numberedPentomino, unNumberedIndexes);
     return !unNumberedIndexes.some(i => this.starredIndexes.has(i));
   }
 
