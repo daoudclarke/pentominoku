@@ -166,6 +166,35 @@ function toggleStar(index) {
 
 
 
+function startWorker() {
+
+  myWorker.onmessage = (e) => {
+    if (e.data.update === "step") {
+      const pentominoIndexes = e.data.pentominos;
+      if (pentominoIndexes.length > bestResult.length) {
+        // const numPentominos = step.filter((x) => x < allNumberedPentominos.length).length;
+        // if (numPentominos >= bestNum) {
+        bestNum = pentominoIndexes.length;
+        bestResult = pentominoIndexes;
+        console.log("New best", pentominoIndexes);
+
+        const pentominos = pentominoIndexes.map(p => new NumberedPentomino(new Pentomino(p.pentomino), p.number, p.indexes));
+        pentominoManager.pentominos = pentominos;
+        pentominoManager.starredIndexes = starredIndexes;
+        pentominoManager.draw();
+        // }
+
+      }
+    }
+
+
+    // myWorker.terminate();
+  };
+
+}
+
+
+
 // function updatePossible() {
 //   const solution = [];
 //   // for (let i=0; i<this.rects.length; ++i) {
@@ -180,32 +209,6 @@ function toggleStar(index) {
 //   sudoku.updatePossible(possibleDecimal);
 // }
 
-
-function startWorker() {
-
-  myWorker.onmessage = (e) => {
-    const step = e.data;
-    if (step.length > bestResult.length) {
-      // const numPentominos = step.filter((x) => x < allNumberedPentominos.length).length;
-      // if (numPentominos >= bestNum) {
-      bestNum = step.length;
-      bestResult = step;
-      console.log("New best", step);
-
-      const pentominos = step.map(p => new NumberedPentomino(new Pentomino(p.pentomino), p.number, p.indexes));
-      pentominoManager.pentominos = pentominos;
-      pentominoManager.starredIndexes = starredIndexes;
-      pentominoManager.draw();
-      // }
-
-    }
-
-
-    // console.log("Message", e);
-    // myWorker.terminate();
-  };
-
-}
 
 
 document.onkeydown = function (e) {

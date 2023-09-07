@@ -35,12 +35,12 @@ pentominoNumbers.set("L", 2);
 pentominoNumbers.set("N", 3);
 pentominoNumbers.set("P", 4);
 pentominoNumbers.set("T", 5);
-pentominoNumbers.set("U", 1);
+pentominoNumbers.set("U", 8);
 pentominoNumbers.set("V", 7);
 pentominoNumbers.set("W", 8);
 pentominoNumbers.set("X", 9);
 pentominoNumbers.set("Y", 1);
-pentominoNumbers.set("Z", 2);
+pentominoNumbers.set("Z", 9);
 
 
 const disallowedPentominoIndexes = new Set();
@@ -390,11 +390,16 @@ export class PentominoSolver {
     const dlx = new Dlx();
     dlx.on('step', (e) => {
       const pentominos = e.partialSolution.map(i => this.allItems[i]);
-      this.onUpdate(pentominos);
+      this.onUpdate({update: "step", "pentominos": pentominos});
+    });
+    dlx.on('solution', (e) => {
+      const pentominos = e.solution.map(i => this.allItems[i]);
+      this.onUpdate({update: "solution", "pentominos": pentominos});
     });
     // dlx.on('solution', onSolution);
-    const result = dlx.solve(this.matrix, {numPrimaryColumns: this.keys.get("s80")});
+    const result = dlx.solve(this.matrix, {numPrimaryColumns: this.keys.get("s80") + 1});
     console.log("Result", result);
+    this.onUpdate({update: "finish", result: result.length});
   }
 }
 
