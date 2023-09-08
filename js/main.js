@@ -88,10 +88,36 @@ class ThermoManager {
   }
 }
 
+
+
+class PentominoSet {
+  constructor(pentominos) {
+    this.items = new Map();
+    for (const pentomino of pentominos) {
+      this.items.set(JSON.stringify(pentomino), pentomino);
+    }
+  }
+
+  intersect(pentominos) {
+    console.log("Intersect", pentominos, [...this.items.values()]);
+    const newPentominos = [];
+    for (const pentomino of pentominos) {
+      let key = JSON.stringify(pentomino);
+      console.log("Key", key);
+      if (this.items.has(key)) {
+        newPentominos.push(pentomino);
+      }
+    }
+    console.log("Intersect end", newPentominos)
+    return new PentominoSet(newPentominos);
+  }
+}
+
+
 const solver = new Solver();
 const sudoku = new Sudoku(onClick);
 // sudoku.draw();
-// const thermoManager = new ThermoManager(solver, sudoku);
+const thermoManager = new ThermoManager(solver, sudoku);
 // thermoManager.addThermo();
 
 // let p = 0;
@@ -141,8 +167,8 @@ let myWorker;
 
 const starredIndexes = new Set();
 let bestResult = [];
-let bestNum = 0;
-let numSolutions = 0;
+let solutions = [];
+let pentominoSet = null;
 function onClick(i) {
   if (myWorker) {
     myWorker.terminate();
@@ -152,9 +178,11 @@ function onClick(i) {
   // starredIndexes.add(i);
   toggleStar(i);
   bestResult = [];
-  bestNum = 0;
-  numSolutions = 0;
+  solutions = [];
+  pentominoSet = null;
+  fixedPoints.clear();
   startWorker();
+  newMessage("Started search");
   myWorker.postMessage(starredIndexes);
 }
 
@@ -167,36 +195,62 @@ function toggleStar(index) {
 }
 
 
+function drawPentominos(pentominoData) {
+  console.log("Draw", pentominoData);
+  pentominoManager.pentominos = pentominoData.map(p => new NumberedPentomino(new Pentomino(p.pentomino), p.number, p.indexes));
+  pentominoManager.starredIndexes = starredIndexes;
+  pentominoManager.draw();
 
-function startWorker() {
+  fixedPoints.clear();
+  for (const pentomino of pentominoData) {
+    for (const index of pentomino.indexes) {
+      fixedPoints.set(index, pentomino.number);
+    }
+  }
+  thermoManager.update();
 
-  myWorker.onmessage = (e) => {
-    if (e.data.update === "step") {
-      const pentominoIndexes = e.data.pentominos;
-      if (pentominoIndexes.length > bestResult.length) {
-        // const numPentominos = step.filter((x) => x < allNumberedPentominos.length).length;
-        // if (numPentominos >= bestNum) {
-        bestNum = pentominoIndexes.length;
-        bestResult = pentominoIndexes;
-        console.log("New best", pentominoIndexes);
+}
 
-        const pentominos = pentominoIndexes.map(p => new NumberedPentomino(new Pentomino(p.pentomino), p.number, p.indexes));
-        pentominoManager.pentominos = pentominos;
-        pentominoManager.starredIndexes = starredIndexes;
-        pentominoManager.draw();
-        // }
+function onWorkerMessage(e) {
+  if (e.data.update === "step") {
+    const pentominoData = e.data.pentominos;
+    if (solutions.length === 0 && pentominoData.length > bestResult.length) {
+      // const numPentominos = step.filter((x) => x < allNumberedPentominos.length).length;
+      // if (numPentominos >= bestNum) {
+      bestResult = pentominoData;
+      // console.log("New best", pentominoIndexes);
 
+      drawPentominos(pentominoData);
+      // }
+
+
+    }
+  } else if (e.data.update === "solution") {
+    solutions.push(e.data.pentominos);
+    if (pentominoSet === null) {
+      pentominoSet = new PentominoSet(e.data.pentominos);
+    } else {
+      pentominoSet = pentominoSet.intersect(e.data.pentominos);
+    }
+    drawPentominos([...pentominoSet.items.values()]);
+    // If we have lots of solutions, randomize and try again to avoid getting lots of similar solutions
+    if (solutions.length >= 2) {
+      myWorker.terminate();
+      if (solutions.length < 10) {
+        myWorker = new Worker("worker.js");
+        startWorker();
+        myWorker.postMessage(starredIndexes);
       }
-    } else if (e.data.update === "solution") {
-      numSolutions++;
-      newMessage("Found new solution: " + numSolutions);
-    } else if (e.data.update === "finish") {
-      newMessage("Finished: " + numSolutions);
     }
 
+    newMessage("Found new solution: " + solutions.length);
+  } else if (e.data.update === "finish") {
+    newMessage("Finished: " + solutions.length);
+  }
+}
 
-    // myWorker.terminate();
-  };
+function startWorker() {
+  myWorker.onmessage = onWorkerMessage;
 
 }
 
