@@ -142,6 +142,7 @@ let myWorker;
 const starredIndexes = new Set();
 let bestResult = [];
 let bestNum = 0;
+let numSolutions = 0;
 function onClick(i) {
   if (myWorker) {
     myWorker.terminate();
@@ -152,6 +153,7 @@ function onClick(i) {
   toggleStar(i);
   bestResult = [];
   bestNum = 0;
+  numSolutions = 0;
   startWorker();
   myWorker.postMessage(starredIndexes);
 }
@@ -185,6 +187,11 @@ function startWorker() {
         // }
 
       }
+    } else if (e.data.update === "solution") {
+      numSolutions++;
+      newMessage("Found new solution: " + numSolutions);
+    } else if (e.data.update === "finish") {
+      newMessage("Finished: " + numSolutions);
     }
 
 
@@ -193,6 +200,16 @@ function startWorker() {
 
 }
 
+function newMessage(message) {
+  const p = document.createElement("p");
+  p.innerText = message;
+
+  const div = document.getElementById("messages");
+  for (const child of div.children) {
+    child.remove();
+  }
+  div.appendChild(p);
+}
 
 
 // function updatePossible() {

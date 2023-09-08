@@ -144,8 +144,8 @@ export class NumberedPentomino {
     this.s.add("r" + y2 + "_" + number);
     this.s.add("b" + box1 + "_" + number);
     this.s.add("b" + box2 + "_" + number);
-    this.s.add("i" + a1);
-    this.s.add("i" + a2);
+    // this.s.add("i" + a1);
+    // this.s.add("i" + a2);
   }
 
   draw(svg, locations, rects) {
@@ -343,15 +343,13 @@ export class PentominoSolver {
   getMatrix() {
     let index=0;
 
-    for (const k of ["s", "i"]) {
-      for (let i=0; i<81; ++i) {
-        if (k === "s" && disallowedPentominoIndexes.has(i)) {
-          continue;
-        }
-
-        this.keys.set(k + i, index);
-        ++index;
+    for (let i=0; i<81; ++i) {
+      if (disallowedPentominoIndexes.has(i)) {
+        continue;
       }
+
+      this.keys.set("s" + i, index);
+      ++index;
     }
     for (const k of ["c", "r", "b"]) {
       for (let i=0; i<9; ++i) {
@@ -396,7 +394,6 @@ export class PentominoSolver {
       const pentominos = e.solution.map(i => this.allItems[i]);
       this.onUpdate({update: "solution", "pentominos": pentominos});
     });
-    // dlx.on('solution', onSolution);
     const result = dlx.solve(this.matrix, {numPrimaryColumns: this.keys.get("s80") + 1});
     console.log("Result", result);
     this.onUpdate({update: "finish", result: result.length});
