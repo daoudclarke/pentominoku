@@ -169,6 +169,7 @@ const starredIndexes = new Set();
 let bestResult = [];
 let solutions = [];
 let pentominoSet = null;
+let numSteps = 0;
 function onClick(i) {
   if (myWorker) {
     myWorker.terminate();
@@ -179,6 +180,7 @@ function onClick(i) {
   toggleStar(i);
   bestResult = [];
   solutions = [];
+  numSteps = 0;
   pentominoSet = null;
   fixedPoints.clear();
   startWorker();
@@ -213,20 +215,27 @@ function drawPentominos(pentominoData) {
 
 function onWorkerMessage(e) {
   if (e.data.update === "step") {
+    ++numSteps;
     const pentominoData = e.data.pentominos;
     if (solutions.length === 0 && pentominoData.length > bestResult.length) {
-      // const numPentominos = step.filter((x) => x < allNumberedPentominos.length).length;
-      // if (numPentominos >= bestNum) {
       bestResult = pentominoData;
-      // console.log("New best", pentominoIndexes);
 
       drawPentominos(pentominoData);
-      // }
-
-
     }
+
+    if (numSteps >= 1000) {
+      // Solution is taking too long, restart with new random order
+      numSteps = 0;
+      myWorker.terminate();
+      myWorker = new Worker("worker.js");
+      startWorker();
+      myWorker.postMessage(starredIndexes);
+    }
+
   } else if (e.data.update === "solution") {
     solutions.push(e.data.pentominos);
+    newMessage("Found new solution: " + solutions.length + " in steps: " + numSteps);
+    numSteps = 0;
     if (pentominoSet === null) {
       pentominoSet = new PentominoSet(e.data.pentominos);
     } else {
@@ -236,14 +245,13 @@ function onWorkerMessage(e) {
     // If we have lots of solutions, randomize and try again to avoid getting lots of similar solutions
     if (solutions.length >= 2) {
       myWorker.terminate();
-      if (solutions.length < 10) {
+      if (solutions.length < 20) {
         myWorker = new Worker("worker.js");
         startWorker();
         myWorker.postMessage(starredIndexes);
       }
     }
 
-    newMessage("Found new solution: " + solutions.length);
   } else if (e.data.update === "finish") {
     newMessage("Finished: " + solutions.length);
   }
