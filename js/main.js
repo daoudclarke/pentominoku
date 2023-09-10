@@ -252,7 +252,7 @@ function onWorkerMessage(e) {
       return;
     }
     solutions.push(e.data.pentominos);
-    newMessage("Found new solution: " + solutions.length + " in steps: " + numSteps);
+    newMessage("Searching... found new solution: " + solutions.length + " in steps: " + numSteps);
     numSteps = 0;
     if (pentominoSet === null) {
       pentominoSet = new PentominoSet(e.data.pentominos);
@@ -271,7 +271,11 @@ function onWorkerMessage(e) {
     }
 
   } else if (e.data.update === "finish") {
-    newMessage("Finished: " + solutions.length);
+    if (solutions.length === 1) {
+      newMessage("Congratulations! unique solution found");
+    } else {
+      newMessage("Finished - found " + solutions.length + " solutions");
+    }
   }
 }
 
@@ -332,3 +336,8 @@ document.onkeydown = function (e) {
   }
   // sudoku.updatePossible();
 };
+
+window.onload = function() {
+  newMessage("Click in the grid to add pentominoku stars");
+}
+
