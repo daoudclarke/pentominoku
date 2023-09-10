@@ -276,5 +276,13 @@ text {
 }
 
 .wrong rect {
-  fill: red;
+  color: red;
+}
+
+.square :hover {
+  fill: #fff;
+}
+
+.square :hover {
+  fill: #eee;
 }

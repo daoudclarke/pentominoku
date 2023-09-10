@@ -1,17 +1,44 @@
 import {allNumbers, allPossible, binaryToArray, getFixedPoints} from "./possible";
 
 
-function atMostRestriction(neighbours) {
+export function atMostRestriction(neighbours) {
   function restriction(currentPossible) {
-    const fixedPoints = getFixedPoints(currentPossible);
     const possible = currentPossible.slice();
-    for (const [i, value] of fixedPoints) {
-      let valueBinary = 1 << (value - 1);
-      const notValue = allNumbers - valueBinary;
-      for (const neighbour of neighbours[i]) {
-        possible[neighbour] &= notValue;
+    for (let i=0; i<possible.length; ++i) {
+      const value = possible[i];
+      const requiredCount = binaryToArray(value).length;
+      // console.log("RequiredCount", requiredCount, "value", value);
+
+      if (requiredCount > 4) {
+        continue;
+      }
+
+      const keep = [];
+      if (requiredCount > 1) {
+        for (const neighbour of neighbours[i]) {
+          const neighbourValue = possible[neighbour];
+          // console.log("Neighbour value", neighbourValue);
+          if ((neighbourValue | value) === value) {
+            keep.push(neighbour);
+            if (keep.length === requiredCount - 1) {
+              break;
+            }
+          }
+        }
+      }
+
+      if (keep.length === requiredCount - 1) {
+        const keepSet = new Set(keep);
+        for (const neighbour of neighbours[i]) {
+          if (keepSet.has(neighbour)) {
+            continue;
+          }
+
+          possible[neighbour] &= ~value;
+        }
       }
     }
+
     return possible;
   }
 
@@ -90,7 +117,7 @@ export const columnRestriction = combinedRestriction(
   [atLeastRestriction(columnNeighbourValues), atMostRestriction(columnNeighbourValues)])
 
 
-function getColumnRow(i) {
+export function getColumnRow(i) {
     const column = i % 9;
     const row = (i - column) / 9;
     return [column, row];
@@ -116,7 +143,7 @@ function boxNeighbours() {
   return neighbours;
 }
 
-const boxNeighbourValues = boxNeighbours();
+export const boxNeighbourValues = boxNeighbours();
 export const boxRestriction = combinedRestriction(
   [atLeastRestriction(boxNeighbourValues), atMostRestriction(boxNeighbourValues)]
 )
@@ -209,25 +236,66 @@ function getThermoMaxBinaryValues() {
 
 const thermoMaxBinaryValues = getThermoMaxBinaryValues();
 
-export function getThermoRestriction(cells) {
-  function restriction(currentPossible) {
+export class ThermoRestriction {
+  constructor(cells) {
+    this.cells = cells;
+  }
+
+  restrict(currentPossible) {
     const possible = currentPossible.slice();
-    for (let i=1; i<cells.length; ++i) {
-      const lastValueBinary = possible[cells[i-1]];
+    for (let i=1; i<this.cells.length; ++i) {
+      const lastValueBinary = possible[this.cells[i-1]];
       const lastValues = binaryToArray(lastValueBinary);
       const minLastValue = Math.min(...lastValues);
       const currentRestrictionBinary = thermoMinBinaryValues[minLastValue - 1];
-      possible[cells[i]] &= currentRestrictionBinary;
+      possible[this.cells[i]] &= currentRestrictionBinary;
     }
-    for (let i=cells.length - 2; i>=0; --i) {
-      const lastValueBinary = possible[cells[i+1]];
+    for (let i=this.cells.length - 2; i>=0; --i) {
+      const lastValueBinary = possible[this.cells[i+1]];
       const lastValues = binaryToArray(lastValueBinary);
       const maxLastValue = Math.max(...lastValues);
       const currentRestrictionBinary = thermoMaxBinaryValues[maxLastValue - 1];
-      possible[cells[i]] &= currentRestrictionBinary;
+      possible[this.cells[i]] &= currentRestrictionBinary;
     }
     return possible;
   }
-  return restriction;
 }
 
+export class PrimeNumberRestriction {
+  constructor(pairs) {
+    this.pairs = pairs;
+
+    const primeNumbers = new Set([2, 3, 5, 7, 11, 13, 17]);
+    this.allowedValues = [];
+    for (let i=1; i<=9; ++i) {
+      let allowedValues = 0;
+      for (let j=1; j<=9; ++j) {
+        if (primeNumbers.has(i + j)) {
+          allowedValues |= 1 << (j - 1);
+        }
+      }
+      this.allowedValues.push(allowedValues);
+    }
+    console.log("Prime pairs", this.allowedValues);
+  }
+
+  restrict(currentPossible) {
+    const possible = currentPossible.slice();
+
+    for (const [first, second] of this.pairs) {
+      this.restrictPrimes(first, second, possible);
+      this.restrictPrimes(second, first, possible);
+    }
+
+    return possible;
+  }
+
+  restrictPrimes(first, second, possible) {
+    const firstPossible = binaryToArray(possible[first]);
+    let secondAllowed = 0;
+    for (const firstValue of firstPossible) {
+      secondAllowed |= this.allowedValues[firstValue - 1];
+    }
+    possible[second] &= secondAllowed;
+  }
+}
