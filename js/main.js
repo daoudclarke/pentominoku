@@ -210,8 +210,23 @@ function drawPentominos(pentominoData) {
     }
   }
   thermoManager.update();
-
 }
+
+
+function isSolutionGood(pentominos) {
+  const solutionFixedPoints = new Map();
+
+  for (const pentomino of pentominos) {
+    for (const index of pentomino.indexes) {
+      solutionFixedPoints.set(index, pentomino.number);
+    }
+  }
+
+  const restrictions = [rowRestriction, columnRestriction, boxRestriction];
+  const possibleBinary = solver.getPossible(solutionFixedPoints, restrictions);
+  return Math.min(...possibleBinary) > 0;
+}
+
 
 function onWorkerMessage(e) {
   if (e.data.update === "step") {
@@ -233,6 +248,9 @@ function onWorkerMessage(e) {
     }
 
   } else if (e.data.update === "solution") {
+    if (!isSolutionGood(e.data.pentominos)) {
+      return;
+    }
     solutions.push(e.data.pentominos);
     newMessage("Found new solution: " + solutions.length + " in steps: " + numSteps);
     numSteps = 0;

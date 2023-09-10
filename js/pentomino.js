@@ -43,6 +43,20 @@ pentominoNumbers.set("Y", 1);
 pentominoNumbers.set("Z", 9);
 
 
+// F: 6
+// L: 2
+// N: 3
+// P: 4
+// T: 5
+// U: 8
+// V: 7
+// W: 8
+// X: 9
+// Y: 1
+// Z: 9
+
+
+
 const disallowedPentominoIndexes = new Set();
 disallowedPentominoIndexes.add(40);
 
@@ -261,7 +275,7 @@ export class Stars {
   draw(svg, locations, rects) {
     for (const i of this.starIndexes) {
       const rect = rects[i];
-      rect.square.polygon("50,5 20,90 95,30 5,30 80,90").attr({fill: "grey"});
+      rect.square.polygon("50,5 20,90 95,30 5,30 80,90").attr({fill: "grey", opacity: 0.5});
     }
   }
 }
